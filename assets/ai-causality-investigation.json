@@ -1,0 +1,1234 @@
+{
+  "generated_at": "2026-07-04T23:59:59",
+  "ai_adoption_date": "2026-05-01",
+  "windows": {
+    "pre_ai": "Dec 2025 – Apr 2026",
+    "post_ai": "May – Jun 2026"
+  },
+  "volume_context": {
+    "bugs_pre": 254,
+    "bugs_post": 123,
+    "bugs_per_month_pre": 51.5,
+    "bugs_per_month_post": 62.4,
+    "enhancements_per_month_pre": 9.5,
+    "enhancements_per_month_post": 25.9
+  },
+  "step1_recurring_issues": [
+    {
+      "issue_name": "Enhancement Request",
+      "engineering_fix_key": "enhancement:request",
+      "first_seen": "2026-02-03",
+      "last_seen": "2026-06-30",
+      "ticket_count": 46,
+      "open_count": 46,
+      "modules": [
+        "CEP / GMS",
+        "Stock",
+        "Barcode Printing",
+        "Job Card / Appointment / Booking / CEP / GMS",
+        "Invoice",
+        "Dashboard",
+        "Reports",
+        "Estimation",
+        "Parts Inwarding",
+        "Job Card",
+        "Payments / Reports",
+        "Job Card / Invoice / Payments / Reports",
+        "Estimation / CEP / GMS",
+        "Job Card / Reports",
+        "Job Card / Estimation / Invoice / Payments",
+        "Invoice / Insurance",
+        "Invoice / Reports",
+        "Stock / Sell Product",
+        "Estimation / Invoice",
+        "All Modules",
+        "Parts Inwarding / Stock",
+        "Invoice / Stock / Reports",
+        "Job Card / Dashboard",
+        "Multiple Modules",
+        "Job Card / Estimation",
+        "Sell Product",
+        "Appointment / Booking",
+        "Parts Inwarding / Reports"
+      ],
+      "workshops": [
+        "Zafco"
+      ],
+      "workshop_count": 1,
+      "trend": "decreasing",
+      "severity": "low",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": " Bosch Service History Upload issue ",
+      "engineering_fix_key": "general:general",
+      "first_seen": "2026-02-02",
+      "last_seen": "2026-06-29",
+      "ticket_count": 21,
+      "open_count": 21,
+      "modules": [
+        "Multiple Modules"
+      ],
+      "workshops": [
+        "Bulk Upload",
+        "ID encription"
+      ],
+      "workshop_count": 2,
+      "trend": "increasing",
+      "severity": "critical",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Job Card Status issue",
+      "engineering_fix_key": "general:job_card",
+      "first_seen": "2026-02-12",
+      "last_seen": "2026-06-29",
+      "ticket_count": 15,
+      "open_count": 15,
+      "modules": [
+        "Job Card / Parts Inwarding / Reports",
+        "Job Card",
+        "Job Card / Invoice",
+        "Job Card / Stock / Sell Product",
+        "Job Card / Estimation / Insurance",
+        "Job Card / Estimation",
+        "Job Card / Estimation / Master Management / Parts Inwarding",
+        "Job Card / CEP / GMS",
+        "Job Card / Stock",
+        "Job Card / Estimation / Invoice",
+        "Job Card / Reports"
+      ],
+      "workshops": [
+        "SMS AUTOMOBILES"
+      ],
+      "workshop_count": 1,
+      "trend": "increasing",
+      "severity": "critical",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Job Card — Content Missing or Incorrect in PDF / Print",
+      "engineering_fix_key": "render:pdf",
+      "first_seen": "2026-02-10",
+      "last_seen": "2026-06-11",
+      "ticket_count": 15,
+      "open_count": 15,
+      "modules": [
+        "Job Card",
+        "Invoice / Insurance",
+        "Invoice / Reports",
+        "Barcode Printing",
+        "Invoice",
+        "Reports",
+        "Job Card / Estimation / Reports",
+        "Estimation",
+        "Job Card / Estimation / Invoice / Sales Register",
+        "Multiple Modules"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "decreasing",
+      "severity": "critical",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Customer Notifications — Notification Not Sent or Delivered",
+      "engineering_fix_key": "notify:messaging",
+      "first_seen": "2026-02-09",
+      "last_seen": "2026-06-10",
+      "ticket_count": 11,
+      "open_count": 11,
+      "modules": [
+        "Job Card",
+        "Job Card / Invoice / Parts Inwarding / Reports",
+        "Appointment / Booking / CEP / GMS",
+        "Dashboard",
+        "Security / Otp",
+        "Job Card / Stock / Reports",
+        "Job Card / Estimation / Invoice",
+        "Reports",
+        "Customer Notifications"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "increasing",
+      "severity": "critical",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Invoice — Tax or Amount Calculation Incorrect",
+      "engineering_fix_key": "calc:tax",
+      "first_seen": "2026-02-13",
+      "last_seen": "2026-06-10",
+      "ticket_count": 10,
+      "open_count": 10,
+      "modules": [
+        "Job Card",
+        "Invoice / Insurance",
+        "Job Card / Invoice / Reports / Dashboard",
+        "Job Card / Invoice / Sales Register / Reports",
+        "Invoice / Sales Register / Reports",
+        "Estimation / Invoice / Insurance / Sell Product",
+        "Tax Compliance",
+        "Job Card / Insurance",
+        "Job Card / Estimation / Invoice / Insurance",
+        "Job Card / Estimation / Parts Inwarding"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "decreasing",
+      "severity": "critical",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Job Card — Configuration or Settings Issue",
+      "engineering_fix_key": "config:settings",
+      "first_seen": "2026-04-23",
+      "last_seen": "2026-07-01",
+      "ticket_count": 9,
+      "open_count": 9,
+      "modules": [
+        "CEP / GMS",
+        "Job Card",
+        "Invoice / Reports",
+        "Invoice",
+        "Job Card / Estimation / Master Management / Parts Inwarding",
+        "Job Card / Sell Product",
+        "Job Card / Estimation / Master Management / Appointment",
+        "Multiple Modules"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "decreasing",
+      "severity": "high",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "stock by line item issue",
+      "engineering_fix_key": "general:stock",
+      "first_seen": "2026-02-03",
+      "last_seen": "2026-06-29",
+      "ticket_count": 9,
+      "open_count": 9,
+      "modules": [
+        "Stock",
+        "Stock / Reports",
+        "Job Card / Stock"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "increasing",
+      "severity": "high",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Job Card — Integration or API Sync Failure",
+      "engineering_fix_key": "integration:api",
+      "first_seen": "2026-02-11",
+      "last_seen": "2026-06-11",
+      "ticket_count": 7,
+      "open_count": 7,
+      "modules": [
+        "Job Card",
+        "Job Card / Estimation / CEP / GMS",
+        "Payments",
+        "Job Card / Estimation",
+        "Appointment / Booking / CEP / GMS",
+        "Invoice"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "high",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Invoice — Number or Sequence Not Generated",
+      "engineering_fix_key": "gen:sequence",
+      "first_seen": "2026-03-23",
+      "last_seen": "2026-06-29",
+      "ticket_count": 3,
+      "open_count": 3,
+      "modules": [
+        "Invoice / Insurance / Reports",
+        "Multiple Modules",
+        "Invoice / Sell Product"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "increasing",
+      "severity": "medium",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Job Card — UI Display or Screen Rendering Issue",
+      "engineering_fix_key": "ui:display",
+      "first_seen": "2026-03-10",
+      "last_seen": "2026-06-29",
+      "ticket_count": 5,
+      "open_count": 5,
+      "modules": [
+        "Estimation / Invoice",
+        "Job Card / Estimation",
+        "Job Card / Estimation / Invoice / Sales Register",
+        "Multiple Modules"
+      ],
+      "workshops": [
+        "Plus button display issue"
+      ],
+      "workshop_count": 1,
+      "trend": "stable",
+      "severity": "high",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Estimation — Duplicate Ticket",
+      "engineering_fix_key": "duplicate:ticket",
+      "first_seen": "2026-04-21",
+      "last_seen": "2026-06-29",
+      "ticket_count": 5,
+      "open_count": 5,
+      "modules": [
+        "Invoice / Insurance",
+        "Estimation / Parts Inwarding / Stock / Barcode Printing",
+        "Estimation",
+        "Parts Inwarding",
+        "Multiple Modules"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "increasing",
+      "severity": "low",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Invoice creation flow analyzation and perrfomance improvement",
+      "engineering_fix_key": "general:invoice",
+      "first_seen": "2026-03-10",
+      "last_seen": "2026-06-12",
+      "ticket_count": 4,
+      "open_count": 4,
+      "modules": [
+        "Invoice",
+        "Estimation / Invoice",
+        "Job Card / Invoice / Insurance / Reports"
+      ],
+      "workshops": [
+        "Invoice Creation – Validation Missing When HSN / SAC Field Is Blank"
+      ],
+      "workshop_count": 1,
+      "trend": "increasing",
+      "severity": "medium",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Group, Category & Sub-Cat not populating in Add Master flow (Inward/Order Page)",
+      "engineering_fix_key": "general:parts_inwarding",
+      "first_seen": "2026-02-16",
+      "last_seen": "2026-04-17",
+      "ticket_count": 2,
+      "open_count": 2,
+      "modules": [
+        "Parts Inwarding / Stock",
+        "Parts Inwarding"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "medium",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Parts Inwarding — User Training or How-To Question",
+      "engineering_fix_key": "training:user",
+      "first_seen": "2026-04-16",
+      "last_seen": "2026-06-29",
+      "ticket_count": 3,
+      "open_count": 3,
+      "modules": [
+        "Master Management / Parts Inwarding",
+        "Reports",
+        "Multiple Modules"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "hsn report analyzation ",
+      "engineering_fix_key": "general:reports",
+      "first_seen": "2026-04-01",
+      "last_seen": "2026-06-12",
+      "ticket_count": 3,
+      "open_count": 3,
+      "modules": [
+        "Reports",
+        "Reports / CEP / GMS"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "increasing",
+      "severity": "medium",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Parts Inwarding — Permission or Access Denied",
+      "engineering_fix_key": "auth:permission",
+      "first_seen": "2026-04-13",
+      "last_seen": "2026-06-08",
+      "ticket_count": 3,
+      "open_count": 3,
+      "modules": [
+        "Master Management",
+        "Parts Inwarding"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "medium",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+      "engineering_fix_key": "general:estimation",
+      "first_seen": "2026-06-11",
+      "last_seen": "2026-06-18",
+      "ticket_count": 2,
+      "open_count": 0,
+      "modules": [
+        "Estimation"
+      ],
+      "workshops": [
+        "DELHI PUBLIC SCHOOL, SUSHANT LOK TRANSPORT",
+        "Sri Srinivasa auto garrage"
+      ],
+      "workshop_count": 2,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": false
+    },
+    {
+      "issue_name": "multiple parts are created in master with same part name, number and brand",
+      "engineering_fix_key": "general:master_management",
+      "first_seen": "2026-07-02",
+      "last_seen": "2026-07-02",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Master Management / Parts Inwarding / Dashboard"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": false
+    },
+    {
+      "issue_name": "corporate dashboard (Franchise – Sales Analytics Dashboard)",
+      "engineering_fix_key": "general:dashboard",
+      "first_seen": "2026-03-11",
+      "last_seen": "2026-03-11",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Invoice / Sales Register / Franchise Management / Dashboard"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": true
+    },
+    {
+      "issue_name": "Kaura-Sales Register  Report – Amount Mismatch",
+      "engineering_fix_key": "general:sales_register",
+      "first_seen": "2026-06-29",
+      "last_seen": "2026-06-29",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Sales Register / Reports"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": false
+    },
+    {
+      "issue_name": "Payment link in mobile app customer link",
+      "engineering_fix_key": "general:payments",
+      "first_seen": "2026-06-09",
+      "last_seen": "2026-06-09",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Payments"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": false
+    },
+    {
+      "issue_name": "Sell products performance issue",
+      "engineering_fix_key": "general:sell_product",
+      "first_seen": "2026-06-04",
+      "last_seen": "2026-06-04",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Invoice / Sell Product"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": false
+    },
+    {
+      "issue_name": "Bosch SEZ",
+      "engineering_fix_key": "general:tax_compliance",
+      "first_seen": "2026-04-29",
+      "last_seen": "2026-04-29",
+      "ticket_count": 1,
+      "open_count": 1,
+      "modules": [
+        "Tax Compliance"
+      ],
+      "workshops": [],
+      "workshop_count": 0,
+      "trend": "stable",
+      "severity": "low",
+      "first_seen_before_ai": true
+    }
+  ],
+  "step2_3_classification": {
+    "total_unique_recurring": 24,
+    "category_a_existed_before_ai": 19,
+    "category_b_new_after_ai": 5,
+    "unknown_date": 0,
+    "pct_existed_before_ai": 79.2,
+    "category_a": [
+      {
+        "name": "Enhancement Request",
+        "first_seen": "2026-02-03",
+        "tickets": 46
+      },
+      {
+        "name": " Bosch Service History Upload issue ",
+        "first_seen": "2026-02-02",
+        "tickets": 21
+      },
+      {
+        "name": "Job Card Status issue",
+        "first_seen": "2026-02-12",
+        "tickets": 15
+      },
+      {
+        "name": "Job Card — Content Missing or Incorrect in PDF / Print",
+        "first_seen": "2026-02-10",
+        "tickets": 15
+      },
+      {
+        "name": "Customer Notifications — Notification Not Sent or Delivered",
+        "first_seen": "2026-02-09",
+        "tickets": 11
+      },
+      {
+        "name": "Invoice — Tax or Amount Calculation Incorrect",
+        "first_seen": "2026-02-13",
+        "tickets": 10
+      },
+      {
+        "name": "Job Card — Configuration or Settings Issue",
+        "first_seen": "2026-04-23",
+        "tickets": 9
+      },
+      {
+        "name": "stock by line item issue",
+        "first_seen": "2026-02-03",
+        "tickets": 9
+      },
+      {
+        "name": "Job Card — Integration or API Sync Failure",
+        "first_seen": "2026-02-11",
+        "tickets": 7
+      },
+      {
+        "name": "Invoice — Number or Sequence Not Generated",
+        "first_seen": "2026-03-23",
+        "tickets": 3
+      },
+      {
+        "name": "Job Card — UI Display or Screen Rendering Issue",
+        "first_seen": "2026-03-10",
+        "tickets": 5
+      },
+      {
+        "name": "Estimation — Duplicate Ticket",
+        "first_seen": "2026-04-21",
+        "tickets": 5
+      },
+      {
+        "name": "Invoice creation flow analyzation and perrfomance improvement",
+        "first_seen": "2026-03-10",
+        "tickets": 4
+      },
+      {
+        "name": "Group, Category & Sub-Cat not populating in Add Master flow (Inward/Order Page)",
+        "first_seen": "2026-02-16",
+        "tickets": 2
+      },
+      {
+        "name": "Parts Inwarding — User Training or How-To Question",
+        "first_seen": "2026-04-16",
+        "tickets": 3
+      },
+      {
+        "name": "hsn report analyzation ",
+        "first_seen": "2026-04-01",
+        "tickets": 3
+      },
+      {
+        "name": "Parts Inwarding — Permission or Access Denied",
+        "first_seen": "2026-04-13",
+        "tickets": 3
+      },
+      {
+        "name": "corporate dashboard (Franchise – Sales Analytics Dashboard)",
+        "first_seen": "2026-03-11",
+        "tickets": 1
+      },
+      {
+        "name": "Bosch SEZ",
+        "first_seen": "2026-04-29",
+        "tickets": 1
+      }
+    ],
+    "category_b": [
+      {
+        "name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+        "first_seen": "2026-06-11",
+        "tickets": 2
+      },
+      {
+        "name": "multiple parts are created in master with same part name, number and brand",
+        "first_seen": "2026-07-02",
+        "tickets": 1
+      },
+      {
+        "name": "Kaura-Sales Register  Report – Amount Mismatch",
+        "first_seen": "2026-06-29",
+        "tickets": 1
+      },
+      {
+        "name": "Payment link in mobile app customer link",
+        "first_seen": "2026-06-09",
+        "tickets": 1
+      },
+      {
+        "name": "Sell products performance issue",
+        "first_seen": "2026-06-04",
+        "tickets": 1
+      }
+    ]
+  },
+  "step4_new_issue_classification": [
+    {
+      "issue_name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+      "classification": "Existing module with recent enhancements (possible new work)",
+      "post_ai_tickets": 2,
+      "pre_ai_tickets_in_cluster": 0,
+      "modules": [
+        "Support Tickets"
+      ],
+      "enhancements_same_module_post_ai": 22
+    },
+    {
+      "issue_name": "multiple parts are created in master with same part name, number and brand",
+      "classification": "Existing module with recent enhancements (possible new work)",
+      "post_ai_tickets": 1,
+      "pre_ai_tickets_in_cluster": 0,
+      "modules": [
+        "Support Tickets"
+      ],
+      "enhancements_same_module_post_ai": 22
+    },
+    {
+      "issue_name": "Kaura-Sales Register  Report – Amount Mismatch",
+      "classification": "Existing module with recent enhancements (possible new work)",
+      "post_ai_tickets": 1,
+      "pre_ai_tickets_in_cluster": 0,
+      "modules": [
+        "Prioritized"
+      ],
+      "enhancements_same_module_post_ai": 8
+    },
+    {
+      "issue_name": "Payment link in mobile app customer link",
+      "classification": "Existing module modified",
+      "post_ai_tickets": 1,
+      "pre_ai_tickets_in_cluster": 0,
+      "modules": [
+        "Backlog"
+      ],
+      "enhancements_same_module_post_ai": 0
+    },
+    {
+      "issue_name": "Sell products performance issue",
+      "classification": "Existing module modified",
+      "post_ai_tickets": 1,
+      "pre_ai_tickets_in_cluster": 0,
+      "modules": [
+        "Build in UAT"
+      ],
+      "enhancements_same_module_post_ai": 0
+    }
+  ],
+  "step5_defect_categories": [
+    {
+      "category": "Edge Cases",
+      "before_count": 77,
+      "after_count": 28,
+      "before_per_month": 15.6,
+      "after_per_month": 14.2,
+      "pct_change_per_month": -9.0,
+      "significant_increase": false
+    },
+    {
+      "category": "UI",
+      "before_count": 55,
+      "after_count": 35,
+      "before_per_month": 11.2,
+      "after_per_month": 17.8,
+      "pct_change_per_month": 58.9,
+      "significant_increase": true
+    },
+    {
+      "category": "Performance",
+      "before_count": 25,
+      "after_count": 21,
+      "before_per_month": 5.1,
+      "after_per_month": 10.7,
+      "pct_change_per_month": 109.8,
+      "significant_increase": true
+    },
+    {
+      "category": "Workflow",
+      "before_count": 31,
+      "after_count": 3,
+      "before_per_month": 6.3,
+      "after_per_month": 1.5,
+      "pct_change_per_month": -76.2,
+      "significant_increase": false
+    },
+    {
+      "category": "Integration",
+      "before_count": 18,
+      "after_count": 11,
+      "before_per_month": 3.7,
+      "after_per_month": 5.6,
+      "pct_change_per_month": 51.4,
+      "significant_increase": true
+    },
+    {
+      "category": "Business Logic",
+      "before_count": 14,
+      "after_count": 6,
+      "before_per_month": 2.8,
+      "after_per_month": 3.0,
+      "pct_change_per_month": 7.1,
+      "significant_increase": false
+    },
+    {
+      "category": "Database",
+      "before_count": 8,
+      "after_count": 8,
+      "before_per_month": 1.6,
+      "after_per_month": 4.1,
+      "pct_change_per_month": 156.2,
+      "significant_increase": true
+    },
+    {
+      "category": "Configuration",
+      "before_count": 9,
+      "after_count": 4,
+      "before_per_month": 1.8,
+      "after_per_month": 2.0,
+      "pct_change_per_month": 11.1,
+      "significant_increase": false
+    },
+    {
+      "category": "API",
+      "before_count": 9,
+      "after_count": 3,
+      "before_per_month": 1.8,
+      "after_per_month": 1.5,
+      "pct_change_per_month": -16.7,
+      "significant_increase": false
+    },
+    {
+      "category": "Incorrect",
+      "before_count": 2,
+      "after_count": 1,
+      "before_per_month": 0.4,
+      "after_per_month": 0.5,
+      "pct_change_per_month": 25.0,
+      "significant_increase": false
+    },
+    {
+      "category": "Repeated",
+      "before_count": 2,
+      "after_count": 1,
+      "before_per_month": 0.4,
+      "after_per_month": 0.5,
+      "pct_change_per_month": 25.0,
+      "significant_increase": false
+    },
+    {
+      "category": "Regression",
+      "before_count": 3,
+      "after_count": 0,
+      "before_per_month": 0.6,
+      "after_per_month": 0.0,
+      "pct_change_per_month": -100.0,
+      "significant_increase": false
+    },
+    {
+      "category": "Validation",
+      "before_count": 0,
+      "after_count": 2,
+      "before_per_month": 0.0,
+      "after_per_month": 1.0,
+      "pct_change_per_month": null,
+      "significant_increase": false
+    },
+    {
+      "category": "Incomplete",
+      "before_count": 1,
+      "after_count": 0,
+      "before_per_month": 0.2,
+      "after_per_month": 0.0,
+      "pct_change_per_month": -100.0,
+      "significant_increase": false
+    }
+  ],
+  "step6_modules": [
+    {
+      "module": "Support Tickets",
+      "before": 226,
+      "after": 92,
+      "before_per_month": 45.9,
+      "after_per_month": 46.7,
+      "pct_change": 1.7,
+      "status": "improved"
+    },
+    {
+      "module": "Prioritized",
+      "before": 0,
+      "after": 13,
+      "before_per_month": 0.0,
+      "after_per_month": 6.6,
+      "pct_change": null,
+      "status": "new_unstable"
+    },
+    {
+      "module": "Search",
+      "before": 4,
+      "after": 3,
+      "before_per_month": 0.8,
+      "after_per_month": 1.5,
+      "pct_change": 87.5,
+      "status": "continuing"
+    },
+    {
+      "module": "Done",
+      "before": 5,
+      "after": 0,
+      "before_per_month": 1.0,
+      "after_per_month": 0.0,
+      "pct_change": -100.0,
+      "status": "improved"
+    },
+    {
+      "module": "Inventory",
+      "before": 3,
+      "after": 2,
+      "before_per_month": 0.6,
+      "after_per_month": 1.0,
+      "pct_change": 66.7,
+      "status": "improved"
+    },
+    {
+      "module": "Reporting",
+      "before": 2,
+      "after": 2,
+      "before_per_month": 0.4,
+      "after_per_month": 1.0,
+      "pct_change": 150.0,
+      "status": "continuing"
+    },
+    {
+      "module": "User Management",
+      "before": 2,
+      "after": 2,
+      "before_per_month": 0.4,
+      "after_per_month": 1.0,
+      "pct_change": 150.0,
+      "status": "continuing"
+    },
+    {
+      "module": "Integrations",
+      "before": 3,
+      "after": 1,
+      "before_per_month": 0.6,
+      "after_per_month": 0.5,
+      "pct_change": -16.7,
+      "status": "improved"
+    },
+    {
+      "module": "Mobile App",
+      "before": 2,
+      "after": 2,
+      "before_per_month": 0.4,
+      "after_per_month": 1.0,
+      "pct_change": 150.0,
+      "status": "continuing"
+    },
+    {
+      "module": "API Gateway",
+      "before": 3,
+      "after": 1,
+      "before_per_month": 0.6,
+      "after_per_month": 0.5,
+      "pct_change": -16.7,
+      "status": "improved"
+    },
+    {
+      "module": "Released(With Release Notes)",
+      "before": 3,
+      "after": 0,
+      "before_per_month": 0.6,
+      "after_per_month": 0.0,
+      "pct_change": -100.0,
+      "status": "improved"
+    },
+    {
+      "module": "Notifications",
+      "before": 0,
+      "after": 2,
+      "before_per_month": 0.0,
+      "after_per_month": 1.0,
+      "pct_change": null,
+      "status": "continuing"
+    },
+    {
+      "module": "Developing",
+      "before": 1,
+      "after": 0,
+      "before_per_month": 0.2,
+      "after_per_month": 0.0,
+      "pct_change": -100.0,
+      "status": "improved"
+    },
+    {
+      "module": "Authentication",
+      "before": 0,
+      "after": 1,
+      "before_per_month": 0.0,
+      "after_per_month": 0.5,
+      "pct_change": null,
+      "status": "continuing"
+    },
+    {
+      "module": "Billing",
+      "before": 0,
+      "after": 1,
+      "before_per_month": 0.0,
+      "after_per_month": 0.5,
+      "pct_change": null,
+      "status": "continuing"
+    },
+    {
+      "module": "Backlog",
+      "before": 0,
+      "after": 1,
+      "before_per_month": 0.0,
+      "after_per_month": 0.5,
+      "pct_change": null,
+      "status": "continuing"
+    }
+  ],
+  "step7_recurring_lifecycle": {
+    "persisted_before_and_still_open": [
+      {
+        "name": "Enhancement Request",
+        "open": 46,
+        "trend": "decreasing"
+      },
+      {
+        "name": " Bosch Service History Upload issue ",
+        "open": 21,
+        "trend": "increasing"
+      },
+      {
+        "name": "Job Card Status issue",
+        "open": 15,
+        "trend": "increasing"
+      },
+      {
+        "name": "Job Card — Content Missing or Incorrect in PDF / Print",
+        "open": 15,
+        "trend": "decreasing"
+      },
+      {
+        "name": "Customer Notifications — Notification Not Sent or Delivered",
+        "open": 11,
+        "trend": "increasing"
+      },
+      {
+        "name": "Invoice — Tax or Amount Calculation Incorrect",
+        "open": 10,
+        "trend": "decreasing"
+      },
+      {
+        "name": "Job Card — Configuration or Settings Issue",
+        "open": 9,
+        "trend": "decreasing"
+      },
+      {
+        "name": "stock by line item issue",
+        "open": 9,
+        "trend": "increasing"
+      },
+      {
+        "name": "Job Card — Integration or API Sync Failure",
+        "open": 7,
+        "trend": "stable"
+      },
+      {
+        "name": "Invoice — Number or Sequence Not Generated",
+        "open": 3,
+        "trend": "increasing"
+      },
+      {
+        "name": "Job Card — UI Display or Screen Rendering Issue",
+        "open": 5,
+        "trend": "stable"
+      },
+      {
+        "name": "Estimation — Duplicate Ticket",
+        "open": 5,
+        "trend": "increasing"
+      },
+      {
+        "name": "Invoice creation flow analyzation and perrfomance improvement",
+        "open": 4,
+        "trend": "increasing"
+      },
+      {
+        "name": "Group, Category & Sub-Cat not populating in Add Master flow (Inward/Order Page)",
+        "open": 2,
+        "trend": "stable"
+      },
+      {
+        "name": "Parts Inwarding — User Training or How-To Question",
+        "open": 3,
+        "trend": "stable"
+      },
+      {
+        "name": "hsn report analyzation ",
+        "open": 3,
+        "trend": "increasing"
+      },
+      {
+        "name": "Parts Inwarding — Permission or Access Denied",
+        "open": 3,
+        "trend": "stable"
+      },
+      {
+        "name": "corporate dashboard (Franchise – Sales Analytics Dashboard)",
+        "open": 1,
+        "trend": "stable"
+      },
+      {
+        "name": "Bosch SEZ",
+        "open": 1,
+        "trend": "stable"
+      }
+    ],
+    "resolved_before_ai_not_seen_post": [],
+    "appeared_only_after_ai": [
+      {
+        "name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+        "first_seen": "2026-06-11",
+        "tickets": 2
+      },
+      {
+        "name": "multiple parts are created in master with same part name, number and brand",
+        "first_seen": "2026-07-02",
+        "tickets": 1
+      },
+      {
+        "name": "Kaura-Sales Register  Report – Amount Mismatch",
+        "first_seen": "2026-06-29",
+        "tickets": 1
+      },
+      {
+        "name": "Payment link in mobile app customer link",
+        "first_seen": "2026-06-09",
+        "tickets": 1
+      },
+      {
+        "name": "Sell products performance issue",
+        "first_seen": "2026-06-04",
+        "tickets": 1
+      }
+    ],
+    "increasing_rapidly": [
+      {
+        "name": " Bosch Service History Upload issue ",
+        "trend": "increasing",
+        "tickets": 21
+      },
+      {
+        "name": "Job Card Status issue",
+        "trend": "increasing",
+        "tickets": 15
+      },
+      {
+        "name": "Customer Notifications — Notification Not Sent or Delivered",
+        "trend": "increasing",
+        "tickets": 11
+      },
+      {
+        "name": "stock by line item issue",
+        "trend": "increasing",
+        "tickets": 9
+      },
+      {
+        "name": "Invoice — Number or Sequence Not Generated",
+        "trend": "increasing",
+        "tickets": 3
+      },
+      {
+        "name": "Estimation — Duplicate Ticket",
+        "trend": "increasing",
+        "tickets": 5
+      },
+      {
+        "name": "Invoice creation flow analyzation and perrfomance improvement",
+        "trend": "increasing",
+        "tickets": 4
+      },
+      {
+        "name": "hsn report analyzation ",
+        "trend": "increasing",
+        "tickets": 3
+      }
+    ]
+  },
+  "step8_ai_patterns": [
+    {
+      "pattern": "Missing validations",
+      "before": 2,
+      "after": 9,
+      "before_per_month": 0.4,
+      "after_per_month": 4.6,
+      "sample_pre": [
+        "Urgent: E-Invoicing Error (Invalid GST 501) Blocking B2B Invoices",
+        "Bulk user import validation errors #195"
+      ],
+      "sample_post": [
+        "GST Number Issue – Last Digit Missing",
+        "Search Functionality:Performance issues for the Labour Master search.\n",
+        "Bulk user import validation errors #41"
+      ]
+    },
+    {
+      "pattern": "Missing edge cases",
+      "before": 1,
+      "after": 1,
+      "before_per_month": 0.2,
+      "after_per_month": 0.5,
+      "sample_pre": [
+        "Issue with Manual WhatsApp Trigger"
+      ],
+      "sample_post": [
+        "Email Delivery Delay Issue"
+      ]
+    },
+    {
+      "pattern": "Incorrect business logic",
+      "before": 22,
+      "after": 15,
+      "before_per_month": 4.5,
+      "after_per_month": 7.6,
+      "sample_pre": [
+        "Customer name mismatching Between Generated Invoice and GST Portal",
+        "garuda motors|Issue while generating job card",
+        "Job Card Issue: Part Issued but Not Reflected in Issue Grid"
+      ],
+      "sample_post": [
+        "Kaura - Sales Register  Report – Amount Mismatch",
+        "Incorrect Customer Phone Number in Estimate",
+        "Stock Value Mismatch for Parts -PADAMNABHAM AUTOMOBILES PVT LTD"
+      ]
+    },
+    {
+      "pattern": "Incomplete implementations",
+      "before": 2,
+      "after": 1,
+      "before_per_month": 0.4,
+      "after_per_month": 0.5,
+      "sample_pre": [
+        "New report based on the Invoices Type",
+        "Correction Required in GST Number – Last Digit Missing\n"
+      ],
+      "sample_post": [
+        "GST Number Issue – Last Digit Missing"
+      ]
+    },
+    {
+      "pattern": "Regression defects",
+      "before": 14,
+      "after": 1,
+      "before_per_month": 2.8,
+      "after_per_month": 0.5,
+      "sample_pre": [
+        "SVA Workshop|expenses Payment posting issue",
+        "Incorrect Delay Error and Proforma Invoice Issue for Delivered Job Cards in mobi",
+        "Common Issue – Part Not Appearing in Inward Page for Multiple Customers"
+      ],
+      "sample_post": [
+        "Duplicate Invoice Numbers Generated Across March and April"
+      ]
+    },
+    {
+      "pattern": "Repeated implementation mistakes",
+      "before": 16,
+      "after": 15,
+      "before_per_month": 3.2,
+      "after_per_month": 7.6,
+      "sample_pre": [
+        "Sri Sai Venkateshwara service |Duplicate part inward issue",
+        "Error in total price in performance invoice ",
+        "collection report records are showing duplicate"
+      ],
+      "sample_post": [
+        " Kaura Motors- Duplicate Vendor Entries in Payment – Transaction Module",
+        "Duplicate Payment Showing in Transaction Page",
+        "Customer Details Changing Automatically While Creating Job Card from Appointment"
+      ]
+    }
+  ],
+  "engineering_fix_crosscheck": {
+    "total_unique_engineering_groups": 26,
+    "first_seen_before_ai": 25,
+    "first_seen_after_ai_only": 1
+  }
+}

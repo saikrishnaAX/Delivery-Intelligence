@@ -1,0 +1,46 @@
+{
+  "volume": {
+    "bugs_pre_total": 254,
+    "bugs_post_total": 123,
+    "bugs_per_month_pre": 50.8,
+    "bugs_per_month_post": 61.5,
+    "enh_per_month_pre": 9.4,
+    "enh_per_month_post": 25.5
+  },
+  "customer_concern_module": {
+    "bugs_pre": 40,
+    "bugs_post_may_jun": 15,
+    "per_month_pre": 8.0,
+    "per_month_post": 7.5,
+    "post_ai_themes": {
+      "Customer concern edits not propagating to the work order": 9,
+      "Job card concern workflow (other)": 3,
+      "Work order open/close lifecycle failures": 1,
+      "Workshop staff cannot enter concerns on the job card": 1,
+      "Removed concerns still appearing on the work order": 1
+    },
+    "pre_ai_themes": {
+      "Customer concern edits not propagating to the work order": 27,
+      "Job card concern workflow (other)": 11,
+      "Work order open/close lifecycle failures": 1,
+      "Arabic or bilingual text rejected in customer concern fields": 1
+    }
+  },
+  "recurring_product_bugs": {
+    "total": 34,
+    "pre_ai": 15,
+    "post_ai_only": 19
+  },
+  "understanding_areas": {
+    "invoice_numbering": "Auto-generated invoice numbers failing or duplicating across periods",
+    "job_card_lifecycle": "Work orders stuck in wrong status \u2014 cannot open, close, or progress",
+    "customer_concern_sync": "Concern data entered on job card does not update or reflect on work order; Arabic input rejected",
+    "pdf_notifications": "PDF output wrong or delayed; WhatsApp/email alerts not delivered",
+    "reports_sync": "Reports slow to load; offline/Zoho sync failures"
+  },
+  "arabic_bilingual_post_ai": {
+    "ticket_count": 6,
+    "bug_count": 0,
+    "understanding": "Arabic script and bilingual input in customer concern / job card fields \u2014 validation or encoding rejects non-Latin text"
+  }
+}

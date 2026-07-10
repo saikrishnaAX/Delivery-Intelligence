@@ -1,0 +1,363 @@
+{
+  "generated_at": "2026-07-04T09:27:27.742400",
+  "ai_adoption_date": "2026-05-01",
+  "methodology": "Bugs counted from all synced tickets by created_at month. Bug = Asana Type or AI category classified as bug. Pre-AI = Dec 2025 through Apr 2026 (5 calendar months). Post-AI = May 2026 through report date.",
+  "pre_ai": {
+    "label": "Dec 2025 \u2013 Apr 2026 (before AI, 1 May 2026)",
+    "months_count": 5,
+    "month_keys": [
+      "2025-12",
+      "2026-01",
+      "2026-02",
+      "2026-03",
+      "2026-04"
+    ],
+    "total_tickets": 857,
+    "total_bugs": 254,
+    "avg_bugs_per_month": 50.8,
+    "avg_tickets_per_month": 171.4
+  },
+  "post_ai": {
+    "label": "May 2026 \u2013 Jul 2026 (after AI)",
+    "months_count": 3,
+    "month_keys": [
+      "2026-05",
+      "2026-06",
+      "2026-07"
+    ],
+    "total_tickets": 451,
+    "total_bugs": 131,
+    "avg_bugs_per_month_all": 43.7,
+    "avg_bugs_per_month_full_months_only": 61.5,
+    "full_months_used": [
+      "2026-05",
+      "2026-06"
+    ],
+    "partial_month_note": "Jul 2026 is partial (8 bugs in 4 days) \u2014 excluded from primary avg."
+  },
+  "comparison": {
+    "bugs_per_month_pre": 50.8,
+    "bugs_per_month_post": 61.5,
+    "change_pct": 21.1,
+    "direction": "increasing",
+    "verdict": "Average bugs created per month is 21.1% higher after AI adoption (50.8/mo pre-AI vs 61.5/mo post-AI full months). This is correlational \u2014 more delivery volume also increased post-AI. June 2026 had 74 bugs \u2014 the highest single month in the window."
+  },
+  "monthly_breakdown": [
+    {
+      "month_key": "2025-12",
+      "label": "Dec 2025",
+      "period": "pre_ai",
+      "tickets_created": 144,
+      "bugs_created": 20,
+      "features_created": 15,
+      "bug_ratio_pct": 13.9
+    },
+    {
+      "month_key": "2026-01",
+      "label": "Jan 2026",
+      "period": "pre_ai",
+      "tickets_created": 154,
+      "bugs_created": 46,
+      "features_created": 14,
+      "bug_ratio_pct": 29.9
+    },
+    {
+      "month_key": "2026-02",
+      "label": "Feb 2026",
+      "period": "pre_ai",
+      "tickets_created": 174,
+      "bugs_created": 54,
+      "features_created": 16,
+      "bug_ratio_pct": 31.0
+    },
+    {
+      "month_key": "2026-03",
+      "label": "Mar 2026",
+      "period": "pre_ai",
+      "tickets_created": 169,
+      "bugs_created": 65,
+      "features_created": 24,
+      "bug_ratio_pct": 38.5
+    },
+    {
+      "month_key": "2026-04",
+      "label": "Apr 2026",
+      "period": "pre_ai",
+      "tickets_created": 216,
+      "bugs_created": 69,
+      "features_created": 26,
+      "bug_ratio_pct": 31.9
+    },
+    {
+      "month_key": "2026-05",
+      "label": "May 2026",
+      "period": "post_ai",
+      "tickets_created": 201,
+      "bugs_created": 49,
+      "features_created": 47,
+      "bug_ratio_pct": 24.4
+    },
+    {
+      "month_key": "2026-06",
+      "label": "Jun 2026",
+      "period": "post_ai",
+      "tickets_created": 229,
+      "bugs_created": 74,
+      "features_created": 37,
+      "bug_ratio_pct": 32.3
+    },
+    {
+      "month_key": "2026-07",
+      "label": "Jul 2026",
+      "period": "post_ai",
+      "tickets_created": 21,
+      "bugs_created": 8,
+      "features_created": 3,
+      "bug_ratio_pct": 38.1
+    }
+  ],
+  "post_ai_issue_nature": {
+    "period": "May \u2013 Jun 2026 (post-AI, from 1 May 2026)",
+    "total_tickets_created": 430,
+    "total_bugs_created": 123,
+    "bugs_still_open": 48,
+    "high_critical_count": 91,
+    "narrative_summary": [
+      "Largest cluster: \"Invoice Number Not Generated\" (18 bugs) \u2014 Number / sequence / auto-ID generation.",
+      "Dominant themes: UI (35), Other (23), Performance (21).",
+      "Most affected areas: Reports (20), Multiple Modules (17), Job Card (11).",
+      "91 of 123 bugs were high or critical priority."
+    ],
+    "root_cause_themes": [
+      {
+        "theme": "UI",
+        "count": 35
+      },
+      {
+        "theme": "Other",
+        "count": 23
+      },
+      {
+        "theme": "Performance",
+        "count": 21
+      },
+      {
+        "theme": "Integration",
+        "count": 11
+      },
+      {
+        "theme": "Database",
+        "count": 8
+      },
+      {
+        "theme": "Invoice",
+        "count": 7
+      },
+      {
+        "theme": "Business Logic",
+        "count": 6
+      },
+      {
+        "theme": "Configuration",
+        "count": 4
+      },
+      {
+        "theme": "Workflow",
+        "count": 3
+      },
+      {
+        "theme": "API",
+        "count": 3
+      }
+    ],
+    "product_modules_affected": [
+      {
+        "module": "Reports",
+        "count": 20
+      },
+      {
+        "module": "Multiple Modules",
+        "count": 17
+      },
+      {
+        "module": "Job Card",
+        "count": 11
+      },
+      {
+        "module": "Invoice",
+        "count": 10
+      },
+      {
+        "module": "Job Card / Invoice",
+        "count": 7
+      },
+      {
+        "module": "Estimation",
+        "count": 6
+      },
+      {
+        "module": "Sales Register / Reports",
+        "count": 4
+      },
+      {
+        "module": "Job Card / Reports",
+        "count": 3
+      },
+      {
+        "module": "Stock",
+        "count": 3
+      },
+      {
+        "module": "Job Card / Estimation",
+        "count": 3
+      }
+    ],
+    "engineering_fix_groups": [
+      {
+        "issue_name": "Invoice Number Not Generated",
+        "engineering_fix": "Number / sequence / auto-ID generation",
+        "bug_count": 18,
+        "sample_titles": [
+          "Invoice Number Missing",
+          "unable to update the job done status",
+          "Unable to Start and Stop for Technician in the JobQueue Dashboard"
+        ]
+      },
+      {
+        "issue_name": "Job Card Status issue",
+        "engineering_fix": "Job Card \u2014 general product issue",
+        "bug_count": 14,
+        "sample_titles": [
+          "Work Order Not Opening \u2013 Urgent Issue",
+          "Unable to Close Job Card Due to Quantity Issue",
+          "Vehicle Not Appearing in Job Card Creation After Adding from Vehicle Management"
+        ]
+      },
+      {
+        "issue_name": "Invoice \u2014 Content Missing or Incorrect in PDF / Print",
+        "engineering_fix": "PDF / print rendering",
+        "bug_count": 12,
+        "sample_titles": [
+          "Additional Discount Displayed as Labour Discount in Reports and Invoice",
+          "Work Order: Problem statement is not updating correctly.(Duplicate entry)\n",
+          "PDF Download/Print Preview Loading Delay"
+        ]
+      },
+      {
+        "issue_name": "Customer Notifications \u2014 Notification Not Sent or Delivered",
+        "engineering_fix": "Email / WhatsApp / SMS delivery",
+        "bug_count": 11,
+        "sample_titles": [
+          "WHATSAPP  Pack Activated but Customer Not Receiving Reminder Messages",
+          "Email notifications delayed by 2+ hours #106",
+          "Email Delivery Delay Issue"
+        ]
+      },
+      {
+        "issue_name": "Offline mode data not syncing #57",
+        "engineering_fix": "Reports \u2014 general product issue",
+        "bug_count": 11,
+        "sample_titles": [
+          "Offline mode data not syncing #57",
+          "GOBYK Corporate Account Report Loading & Contact Number Validation Issue",
+          "Chart rendering broken in Safari #64"
+        ]
+      },
+      {
+        "issue_name": "Duplicate Ticket",
+        "engineering_fix": "Duplicate report",
+        "bug_count": 9,
+        "sample_titles": [
+          " Kaura Motors- Duplicate Vendor Entries in Payment \u2013 Transaction Module",
+          "Duplicate Payment Showing in Transaction Page",
+          "Customer Details Changing Automatically While Creating Job Card from Appointment / Direct Job Card Creation"
+        ]
+      },
+      {
+        "issue_name": "Customer Performance Issue \u2013 Investigation Required",
+        "engineering_fix": "General \u2014 general product issue",
+        "bug_count": 6,
+        "sample_titles": [
+          "Technician unable to Clock out issue (AZ Garage)",
+          "Customer Performance Issue \u2013 Investigation Required",
+          "Existing parts not being fetched while odering"
+        ]
+      },
+      {
+        "issue_name": "Issue while bulk upload in upload stock module ",
+        "engineering_fix": "Stock \u2014 general product issue",
+        "bug_count": 6,
+        "sample_titles": [
+          "Unable to issue the part",
+          "Stock Value Mismatch for Parts -PADAMNABHAM AUTOMOBILES PVT LTD",
+          "Issue in Opening and Closing Stock Values in Reports"
+        ]
+      },
+      {
+        "issue_name": "Reports \u2014 Integration or API Sync Failure",
+        "engineering_fix": "External API / sync integration",
+        "bug_count": 5,
+        "sample_titles": [
+          "Bulk user import validation errors #41",
+          "Rate limit config not persisting #118",
+          "Failed zoho invoices |Action auto"
+        ]
+      },
+      {
+        "issue_name": "Tax or Amount Calculation Incorrect",
+        "engineering_fix": "Tax / GST / calculation logic",
+        "bug_count": 4,
+        "sample_titles": [
+          "GST Number Issue \u2013 Last Digit Missing",
+          "Collision Page Not Working in Mobile Application",
+          "Issue in Job Card Inward Process and Vendor Name Edit Impact on Existing Data"
+        ]
+      },
+      {
+        "issue_name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+        "engineering_fix": "Estimation \u2014 general product issue",
+        "bug_count": 4,
+        "sample_titles": [
+          "Unable to Unmark Parts from Estimation List",
+          "Incorrect Customer Phone Number in Estimate",
+          "Issue in Estimation Page \u2013 Auto-added Labour Line Item & Service Rate Reset"
+        ]
+      },
+      {
+        "issue_name": "Job Card \u2014 UI Display or Screen Rendering Issue",
+        "engineering_fix": "UI display / screen rendering",
+        "bug_count": 4,
+        "sample_titles": [
+          "Parts missing in inward bill - V2 AUTOMOTIVE",
+          "Issue While Adding Parts in Master Management - HIGHWAY AUTOMOBILES",
+          " Vehicle Service History Details Not Visible"
+        ]
+      }
+    ],
+    "priority_breakdown": [
+      {
+        "priority": "high",
+        "count": 89
+      },
+      {
+        "priority": "medium",
+        "count": 27
+      },
+      {
+        "priority": "low",
+        "count": 5
+      },
+      {
+        "priority": "critical",
+        "count": 2
+      }
+    ],
+    "recommended_focus": [
+      "Invoice Number Not Generated",
+      "Job Card Status issue",
+      "Invoice \u2014 Content Missing or Incorrect in PDF / Print",
+      "Customer Notifications \u2014 Notification Not Sent or Delivered",
+      "Offline mode data not syncing #57"
+    ]
+  }
+}

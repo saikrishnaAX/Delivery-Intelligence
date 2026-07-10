@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 30 8% 97%;
+    --foreground: 20 10% 12%;
+    --card: 30 10% 99%;
+    --card-foreground: 20 10% 12%;
+    --primary: 24 95% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 6% 93%;
+    --secondary-foreground: 20 8% 30%;
+    --muted: 30 6% 93%;
+    --muted-foreground: 20 5% 46%;
+    --accent: 24 90% 94%;
+    --accent-foreground: 24 80% 35%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 60% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --border: 30 8% 88%;
+    --input: 30 8% 88%;
+    --ring: 24 95% 53%;
+    --radius: 0.5rem;
+    --sidebar: 20 10% 14%;
+    --sidebar-foreground: 30 10% 85%;
+    --sidebar-accent: 24 95% 53%;
+    --sidebar-border: 20 8% 20%;
+    --chart-1: 24 95% 53%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 0 72% 51%;
+    --chart-4: 152 60% 40%;
+    --chart-5: 20 5% 46%;
+  }
+
+  .dark {
+    --background: 0 0% 5%;
+    --foreground: 30 8% 90%;
+    --card: 0 0% 8%;
+    --card-foreground: 30 8% 90%;
+    --primary: 24 95% 55%;
+    --primary-foreground: 0 0% 5%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 30 6% 75%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 30 4% 52%;
+    --accent: 24 50% 12%;
+    --accent-foreground: 24 90% 65%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 152 55% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 5%;
+    --border: 0 0% 14%;
+    --input: 0 0% 14%;
+    --ring: 24 95% 55%;
+    --sidebar: 0 0% 4%;
+    --sidebar-foreground: 30 8% 78%;
+    --sidebar-accent: 24 95% 55%;
+    --sidebar-border: 0 0% 12%;
+    --chart-1: 24 95% 55%;
+    --chart-2: 38 92% 50%;
+    --chart-3: 0 62% 50%;
+    --chart-4: 152 55% 45%;
+    --chart-5: 30 4% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    font-size: 14px;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased text-sm leading-relaxed;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.25) transparent;
+  }
+}
+
+@layer components {
+  .page-content {
+    @apply p-4 md:p-5 space-y-4 animate-fade-in;
+  }
+  .section-title {
+    @apply text-xs font-medium text-muted-foreground uppercase tracking-wider;
+  }
+}

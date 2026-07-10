@@ -1,0 +1,363 @@
+{
+  "period": "May – Jun 2026 (post-AI, from 1 May 2026)",
+  "total_tickets_created": 430,
+  "total_bugs_created": 123,
+  "ticket_type_mix": {
+    "configuration": 23,
+    "knowledge_gap": 33,
+    "enhancement": 51,
+    "bug": 123,
+    "task": 142,
+    "duplicate": 25,
+    "requirement": 33
+  },
+  "bugs_still_open": 48,
+  "priority_breakdown": {
+    "high": 89,
+    "medium": 27,
+    "low": 5,
+    "critical": 2
+  },
+  "root_cause_themes": [
+    {
+      "theme": "UI",
+      "count": 35
+    },
+    {
+      "theme": "Other",
+      "count": 23
+    },
+    {
+      "theme": "Performance",
+      "count": 21
+    },
+    {
+      "theme": "Integration",
+      "count": 11
+    },
+    {
+      "theme": "Database",
+      "count": 8
+    },
+    {
+      "theme": "Invoice",
+      "count": 7
+    },
+    {
+      "theme": "Business Logic",
+      "count": 6
+    },
+    {
+      "theme": "Configuration",
+      "count": 4
+    },
+    {
+      "theme": "Workflow",
+      "count": 3
+    },
+    {
+      "theme": "API",
+      "count": 3
+    },
+    {
+      "theme": "Validation",
+      "count": 2
+    }
+  ],
+  "product_modules_affected": [
+    {
+      "module": "Reports",
+      "count": 20
+    },
+    {
+      "module": "Multiple Modules",
+      "count": 17
+    },
+    {
+      "module": "Job Card",
+      "count": 11
+    },
+    {
+      "module": "Invoice",
+      "count": 10
+    },
+    {
+      "module": "Job Card / Invoice",
+      "count": 7
+    },
+    {
+      "module": "Estimation",
+      "count": 6
+    },
+    {
+      "module": "Sales Register / Reports",
+      "count": 4
+    },
+    {
+      "module": "Job Card / Reports",
+      "count": 3
+    },
+    {
+      "module": "Stock",
+      "count": 3
+    },
+    {
+      "module": "Job Card / Estimation",
+      "count": 3
+    },
+    {
+      "module": "Stock / Reports",
+      "count": 3
+    },
+    {
+      "module": "Customer Notifications",
+      "count": 2
+    }
+  ],
+  "asana_sections": [
+    {
+      "section": "Support Tickets",
+      "count": 92
+    },
+    {
+      "section": "Prioritized",
+      "count": 13
+    },
+    {
+      "section": "Search",
+      "count": 3
+    },
+    {
+      "section": "Inventory",
+      "count": 2
+    },
+    {
+      "section": "Reporting",
+      "count": 2
+    },
+    {
+      "section": "Notifications",
+      "count": 2
+    },
+    {
+      "section": "Mobile App",
+      "count": 2
+    },
+    {
+      "section": "User Management",
+      "count": 2
+    }
+  ],
+  "top_workshops": [
+    {
+      "workshop": "TG Workshop",
+      "count": 3
+    },
+    {
+      "workshop": "LACAUTOSERVICE",
+      "count": 3
+    },
+    {
+      "workshop": "EXL AUTO WORKS",
+      "count": 2
+    },
+    {
+      "workshop": "TURBO MOTORS GARAGE -AX1776919726730",
+      "count": 2
+    },
+    {
+      "workshop": "Action Auto",
+      "count": 2
+    },
+    {
+      "workshop": "Bharat Motors",
+      "count": 1
+    },
+    {
+      "workshop": "KAURA MOTORS NIGERIA LTD-AX1771576605032",
+      "count": 1
+    },
+    {
+      "workshop": "SAAKAR AUTOMOTIVE",
+      "count": 1
+    },
+    {
+      "workshop": "AX1771576605032-KAURA MOTORS NIGERIA LTD",
+      "count": 1
+    },
+    {
+      "workshop": "SERVICE CITY",
+      "count": 1
+    }
+  ],
+  "engineering_fix_groups": [
+    {
+      "issue_name": "Invoice Number Not Generated",
+      "engineering_fix": "Number / sequence / auto-ID generation",
+      "bug_count": 18,
+      "sample_titles": [
+        "Invoice Number Missing",
+        "unable to update the job done status",
+        "Unable to Start and Stop for Technician in the JobQueue Dashboard",
+        "Duplicate Invoice Numbers Generated Across March and April"
+      ]
+    },
+    {
+      "issue_name": "Job Card Status issue",
+      "engineering_fix": "Job Card — general product issue",
+      "bug_count": 14,
+      "sample_titles": [
+        "Work Order Not Opening – Urgent Issue",
+        "Unable to Close Job Card Due to Quantity Issue",
+        "Vehicle Not Appearing in Job Card Creation After Adding from Vehicle Management",
+        "Unable to enter customer concerns in job card - AUTOO BOTS"
+      ]
+    },
+    {
+      "issue_name": "Invoice — Content Missing or Incorrect in PDF / Print",
+      "engineering_fix": "PDF / print rendering",
+      "bug_count": 12,
+      "sample_titles": [
+        "Additional Discount Displayed as Labour Discount in Reports and Invoice",
+        "Work Order: Problem statement is not updating correctly.(Duplicate entry)\n",
+        "PDF Download/Print Preview Loading Delay",
+        "Stamp Appears Oversized and Misaligned in Generated PDF"
+      ]
+    },
+    {
+      "issue_name": "Customer Notifications — Notification Not Sent or Delivered",
+      "engineering_fix": "Email / WhatsApp / SMS delivery",
+      "bug_count": 11,
+      "sample_titles": [
+        "WHATSAPP  Pack Activated but Customer Not Receiving Reminder Messages",
+        "Email notifications delayed by 2+ hours #106",
+        "Email Delivery Delay Issue",
+        "Payment gateway timeout on checkout #140"
+      ]
+    },
+    {
+      "issue_name": "Offline mode data not syncing #57",
+      "engineering_fix": "Reports — general product issue",
+      "bug_count": 11,
+      "sample_titles": [
+        "Offline mode data not syncing #57",
+        "GOBYK Corporate Account Report Loading & Contact Number Validation Issue",
+        "Chart rendering broken in Safari #64",
+        "Autorox Logout Issue While Accessing Report Module"
+      ]
+    },
+    {
+      "issue_name": "Duplicate Ticket",
+      "engineering_fix": "Duplicate report",
+      "bug_count": 9,
+      "sample_titles": [
+        " Kaura Motors- Duplicate Vendor Entries in Payment – Transaction Module",
+        "Duplicate Payment Showing in Transaction Page",
+        "Customer Details Changing Automatically While Creating Job Card from Appointment / Direct Job Card C",
+        "unable to issue the parts "
+      ]
+    },
+    {
+      "issue_name": "Customer Performance Issue – Investigation Required",
+      "engineering_fix": "General — general product issue",
+      "bug_count": 6,
+      "sample_titles": [
+        "Technician unable to Clock out issue (AZ Garage)",
+        "Customer Performance Issue – Investigation Required",
+        "Existing parts not being fetched while odering",
+        "Unexpected Error Occurs While Clicking on Transactions Module in Collections"
+      ]
+    },
+    {
+      "issue_name": "Issue while bulk upload in upload stock module ",
+      "engineering_fix": "Stock — general product issue",
+      "bug_count": 6,
+      "sample_titles": [
+        "Unable to issue the part",
+        "Stock Value Mismatch for Parts -PADAMNABHAM AUTOMOBILES PVT LTD",
+        "Issue in Opening and Closing Stock Values in Reports",
+        "Multiple Issues in Stock Module and Fitment Mapping – AUTO 360"
+      ]
+    },
+    {
+      "issue_name": "Reports — Integration or API Sync Failure",
+      "engineering_fix": "External API / sync integration",
+      "bug_count": 5,
+      "sample_titles": [
+        "Bulk user import validation errors #41",
+        "Rate limit config not persisting #118",
+        "Failed zoho invoices |Action auto",
+        "Zoho Purchase Invoice Sync Failure Analysis"
+      ]
+    },
+    {
+      "issue_name": "Tax or Amount Calculation Incorrect",
+      "engineering_fix": "Tax / GST / calculation logic",
+      "bug_count": 4,
+      "sample_titles": [
+        "GST Number Issue – Last Digit Missing",
+        "Collision Page Not Working in Mobile Application",
+        "Issue in Job Card Inward Process and Vendor Name Edit Impact on Existing Data",
+        "Deleted Concerns Not Reflected in Work Order"
+      ]
+    },
+    {
+      "issue_name": "Estimation details error |Sri Srinivasa auto garrage from kurnool",
+      "engineering_fix": "Estimation — general product issue",
+      "bug_count": 4,
+      "sample_titles": [
+        "Unable to Unmark Parts from Estimation List",
+        "Incorrect Customer Phone Number in Estimate",
+        "Issue in Estimation Page – Auto-added Labour Line Item & Service Rate Reset",
+        "Estimation details error |Sri Srinivasa auto garrage from kurnool"
+      ]
+    },
+    {
+      "issue_name": "Job Card — UI Display or Screen Rendering Issue",
+      "engineering_fix": "UI display / screen rendering",
+      "bug_count": 4,
+      "sample_titles": [
+        "Parts missing in inward bill - V2 AUTOMOTIVE",
+        "Issue While Adding Parts in Master Management - HIGHWAY AUTOMOBILES",
+        " Vehicle Service History Details Not Visible",
+        "Ui Issue: Job card Order page - Plus button display issue"
+      ]
+    },
+    {
+      "issue_name": "Kaura - Sales Register  Report – Amount Mismatch",
+      "engineering_fix": "Sales Register — general product issue",
+      "bug_count": 3,
+      "sample_titles": [
+        "Kaura - Sales Register  Report – Amount Mismatch",
+        "Data Consistency: Discrepancy identified between “Sales Register – Show More” and “Show Less” views",
+        "Kaura-Sales Register  Report – Amount Mismatch"
+      ]
+    },
+    {
+      "issue_name": "Reports — Permission or Access Denied",
+      "engineering_fix": "Permissions / role access",
+      "bug_count": 3,
+      "sample_titles": [
+        "Admin User missing",
+        "Role assignment not reflecting immediately #173",
+        "Role assignment not reflecting immediately #138"
+      ]
+    },
+    {
+      "issue_name": "Job Card — Configuration or Settings Issue",
+      "engineering_fix": "Configuration / settings",
+      "bug_count": 3,
+      "sample_titles": [
+        "Job Card Module Visibility Issue After Disabling from Super Admin",
+        "Enhancement Request – QR/Barcode Scanner Not Fetching SKU Parts from Masters Module",
+        "Scheme/Package Issue"
+      ]
+    }
+  ],
+  "narrative_summary": [
+    "Largest engineering-fix cluster: \"Invoice Number Not Generated\" (18 bugs) — Number / sequence / auto-ID generation.",
+    "Dominant symptom themes from ticket text: UI (35), Other (23), Performance (21).",
+    "Most affected product areas: Reports (20), Multiple Modules (17), Job Card (11).",
+    "91 of 123 bugs were high or critical priority."
+  ]
+}
