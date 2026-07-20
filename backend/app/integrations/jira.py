@@ -39,7 +39,16 @@ class JiraClient:
                 payload: dict = {
                     "jql": jql,
                     "maxResults": min(page_size, max_results - len(issues)),
-                    "fields": ["summary", "status", "issuetype", "assignee", "created", "updated"],
+                    "fields": [
+                        "summary",
+                        "status",
+                        "issuetype",
+                        "assignee",
+                        "created",
+                        "updated",
+                        "parent",
+                        "description",
+                    ],
                 }
                 if next_page_token:
                     payload["nextPageToken"] = next_page_token
@@ -66,11 +75,68 @@ class JiraClient:
             resp = await client.get(
                 f"{self.base_url}/rest/api/3/issue/{issue_key}",
                 headers=self._auth_header(),
+                params={
+                    "fields": "summary,status,issuetype,assignee,parent,description,project,created,updated",
+                },
             )
             if resp.status_code == 404:
                 return None
             resp.raise_for_status()
             return resp.json()
+
+    async def register_webhook(self, target_url: str, project_key: str | None = None) -> dict:
+        """Register a dynamic Jira Cloud webhook (expires ~30 days; refreshed on startup)."""
+        self._refresh_settings()
+        if not self.is_configured:
+            raise RuntimeError("Jira is not configured")
+        key = project_key or self.default_project_key
+        jql = f"project = {key}" if key else "project is not EMPTY"
+        payload = {
+            "url": target_url,
+            "webhooks": [
+                {
+                    "events": ["jira:issue_created", "jira:issue_updated"],
+                    "jqlFilter": jql,
+                }
+            ],
+        }
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{self.base_url}/rest/api/3/webhook",
+                headers={**self._auth_header(), "Content-Type": "application/json"},
+                json=payload,
+            )
+            resp.raise_for_status()
+            return resp.json()
+
+    async def list_webhooks(self) -> list[dict]:
+        self._refresh_settings()
+        if not self.is_configured:
+            return []
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.get(
+                f"{self.base_url}/rest/api/3/webhook",
+                headers=self._auth_header(),
+            )
+            if resp.status_code == 404:
+                return []
+            resp.raise_for_status()
+            body = resp.json()
+            if isinstance(body, list):
+                return body
+            return body.get("values") or body.get("webhooks") or []
+
+    async def delete_webhook(self, webhook_id: int | str) -> None:
+        self._refresh_settings()
+        if not self.is_configured:
+            return
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.delete(
+                f"{self.base_url}/rest/api/3/webhook/{webhook_id}",
+                headers=self._auth_header(),
+            )
+            if resp.status_code not in (200, 204, 404):
+                resp.raise_for_status()
 
     async def fetch_active_sprints(self, board_id: int | None = None) -> list[dict]:
         """Fetch sprints if board_id provided; otherwise return empty."""

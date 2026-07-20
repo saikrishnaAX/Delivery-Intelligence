@@ -55,7 +55,10 @@ function withParams(
   if (dateFrom) params.set("date_from", dateFrom);
   if (dateTo) params.set("date_to", dateTo);
   const qs = params.toString();
-  return qs ? `${endpoint}?${qs}` : endpoint;
+  if (!qs) return endpoint;
+  // Endpoints may already include query params (e.g. /execution/drilldown?metric=…).
+  const sep = endpoint.includes("?") ? "&" : "?";
+  return `${endpoint}${sep}${qs}`;
 }
 
 async function fetchApi<T>(
@@ -145,8 +148,14 @@ export const api = {
   getProjects: () =>
     fetchApi<import("@/types").AsanaProject[]>("/projects"),
 
-  syncProject: (projectGid: string) =>
-    fetchApi<import("@/types").SyncResult>(`/sync/${projectGid}`, { method: "POST" }, 300_000),
+  syncProject: (projectGid: string, options?: { incremental?: boolean }) => {
+    const qs = options?.incremental ? "?incremental=true" : "";
+    return fetchApi<import("@/types").SyncResult>(
+      `/sync/${projectGid}${qs}`,
+      { method: "POST" },
+      options?.incremental ? 180_000 : 300_000
+    );
+  },
 
   getExecutionBoard: (projectGid?: string | null, dateFrom?: string, dateTo?: string) =>
     fetchApiRead<import("@/types").ExecutionBoardData>(withParams("/execution", projectGid, dateFrom, dateTo)),

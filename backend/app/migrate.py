@@ -42,7 +42,9 @@ MIGRATIONS = [
     ("tickets", "dor_value", "VARCHAR(50)"),
     ("tickets", "released_at", "DATETIME"),
     ("tickets", "asana_board_index", "INTEGER"),
+    ("tickets", "parent_asana_gid", "VARCHAR(50)"),
     ("tickets", "removed_from_asana", "BOOLEAN DEFAULT 0"),
+    ("jira_issues", "parent_jira_key", "VARCHAR(50)"),
     ("ticket_section_moves", "CREATE TABLE IF NOT EXISTS ticket_section_moves ("
      "id INTEGER PRIMARY KEY, ticket_id INTEGER NOT NULL, asana_gid VARCHAR(50), "
      "from_section VARCHAR(255), to_section VARCHAR(255) NOT NULL, "

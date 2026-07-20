@@ -39,7 +39,8 @@ async def sync_project_after_asana_change(
 ) -> dict:
     """Pull one Asana project, refresh sprint sheets, optional Jira."""
     svc = SyncService(db)
-    result = await svc.sync_all(project_gid)
+    # Background / webhook pulls: only changed tasks since last sync.
+    result = await svc.sync_all(project_gid, incremental=True)
     sheet_results: list[dict] = []
     if result.get("success"):
         sheet_results = sync_all_sprint_sheets(db, project_gid)

@@ -36,11 +36,22 @@ class Settings(BaseSettings):
     google_service_account_file: str = ""
     google_service_account_json: str = ""
 
-    # Gmail SMTP (release notes + workshop reminders)
+    # Gmail SMTP (release notes + workshop reminders + status-move digests)
     gmail_user: str = ""
     gmail_app_password: str = ""
     email_from_name: str = "Autorox Command Center"
     support_head_email: str = ""
+
+    # Status-move alerts (Asana column changes during sync)
+    status_move_notify_enabled: bool = True
+    # Google Chat incoming webhook URL (Spaces → Apps & integrations → Webhooks)
+    google_chat_webhook_url: str = ""
+    # Comma-separated tech emails only; empty = no email (never uses SUPPORT_HEAD_EMAIL)
+    status_move_email_to: str = ""
+    # If true, only notify moves into Testing / Done / Released (quieter Chat)
+    status_move_highlight_only: bool = False
+    # New Jira Bug/Sub-task under a parent → same Google Chat space
+    jira_bug_notify_enabled: bool = True
 
     # CEO Intelligence
     ai_adoption_date: str = "2026-05-01"
@@ -89,6 +100,15 @@ class Settings(BaseSettings):
     @property
     def email_configured(self) -> bool:
         return bool(self.gmail_user.strip() and self.gmail_app_password.strip())
+
+    @property
+    def google_chat_configured(self) -> bool:
+        return bool(self.google_chat_webhook_url.strip())
+
+    @property
+    def status_move_email_recipients(self) -> list[str]:
+        """Tech-team digests only — never falls back to SUPPORT_HEAD_EMAIL / Prasad."""
+        return [e.strip() for e in self.status_move_email_to.split(",") if e.strip()]
 
     @property
     def cursor_configured(self) -> bool:

@@ -71,7 +71,15 @@ export function CEOReportPanel() {
       const result = await api.previewCEOReport(projectGid, period);
       setPreview(result);
     } catch (err) {
-      error("Preview failed", err instanceof Error ? err.message : "Could not load email preview.");
+      const message = err instanceof Error ? err.message : "Could not load email preview.";
+      const status = err && typeof err === "object" && "status" in err ? (err as { status?: number }).status : undefined;
+      const is404 = status === 404 || message.toLowerCase().includes("not found");
+      error(
+        "Preview failed",
+        is404
+          ? "Email preview API is unavailable. Restart the backend on port 8003, then try again."
+          : message
+      );
     } finally {
       setPreviewing(false);
     }

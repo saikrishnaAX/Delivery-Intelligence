@@ -31,14 +31,24 @@ function recalcTotal(row: SprintSheetRow): SprintSheetRow {
   };
 }
 
-type EditableKey = "qa_estimate" | "dev_assigned" | "qa_assigned" | "status";
+type EditableKey = "priority" | "qa_estimate" | "dev_assigned" | "qa_assigned" | "status";
 
 const EDITABLE: { key: EditableKey; label: string; width: string }[] = [
   { key: "qa_estimate", label: "QA Est", width: "min-w-[72px]" },
   { key: "dev_assigned", label: "Dev Assigned", width: "min-w-[100px]" },
   { key: "qa_assigned", label: "QA Assigned", width: "min-w-[100px]" },
-  { key: "status", label: "Status", width: "min-w-[120px]" },
 ];
+
+function isValidJiraBrowseLink(url?: string | null): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    const m = u.pathname.match(/\/browse\/([A-Z][A-Z0-9]+-\d+)$/i);
+    return Boolean(m);
+  } catch {
+    return false;
+  }
+}
 
 function typeBadgeVariant(type?: string | null): "destructive" | "default" | "outline" {
   const t = (type ?? "").toLowerCase();
@@ -79,9 +89,10 @@ function sortRowsForDisplay(rows: SprintSheetRow[]): SprintSheetRow[] {
   return [...rows]
     .filter((r) => r.sheet_status !== "removed")
     .sort((a, b) => {
+      // App UI: Prioritized → Done so new backlog work is visible at the top.
       const stageA = pipelineStageRank(a.section_name);
       const stageB = pipelineStageRank(b.section_name);
-      if (stageA !== stageB) return stageB - stageA;
+      if (stageA !== stageB) return stageA - stageB;
       return (a.asana_board_index ?? 999999) - (b.asana_board_index ?? 999999);
     });
 }
@@ -106,24 +117,25 @@ function SprintSheetTable({ tableRows, onUpdateRow }: SprintSheetTableProps) {
     <div className="overflow-x-auto rounded-md border border-border">
       <table className="w-full text-[10px] table-fixed min-w-[1260px]">
         <colgroup>
-          <col style={{ width: "240px" }} />
-          <col style={{ width: "96px" }} />
+          <col style={{ width: "220px" }} />
+          <col style={{ width: "88px" }} />
           <col style={{ width: "72px" }} />
-          <col style={{ width: "64px" }} />
-          <col style={{ width: "64px" }} />
-          <col style={{ width: "96px" }} />
-          <col style={{ width: "64px" }} />
-          <col style={{ width: "80px" }} />
-          <col style={{ width: "108px" }} />
-          <col style={{ width: "108px" }} />
           <col style={{ width: "120px" }} />
-          <col style={{ width: "64px" }} />
+          <col style={{ width: "56px" }} />
+          <col style={{ width: "56px" }} />
+          <col style={{ width: "88px" }} />
+          <col style={{ width: "56px" }} />
+          <col style={{ width: "72px" }} />
+          <col style={{ width: "100px" }} />
+          <col style={{ width: "100px" }} />
+          <col style={{ width: "56px" }} />
         </colgroup>
         <thead>
           <tr className="bg-muted/50 text-left">
             <th className="px-2 py-2 font-medium">Ticket</th>
             <th className="px-2 py-2 font-medium">Type</th>
             <th className="px-2 py-2 font-medium">Priority</th>
+            <th className="px-2 py-2 font-medium">Status</th>
             <th className="px-2 py-2 font-medium">Asana</th>
             <th className="px-2 py-2 font-medium">Jira</th>
             <th className="px-2 py-2 font-medium">Jira Status</th>
@@ -165,14 +177,22 @@ function SprintSheetTable({ tableRows, onUpdateRow }: SprintSheetTableProps) {
                   {row.ticket_type ?? "—"}
                 </Badge>
               </td>
-              <td className="px-2 py-1.5 align-top whitespace-nowrap">
-                {row.priority ? (
-                  <Badge variant={priorityBadgeVariant(row.priority)} className="text-[9px] whitespace-nowrap">
-                    {row.priority}
-                  </Badge>
-                ) : (
-                  "—"
-                )}
+              <td className="px-1 py-1 align-top">
+                <Input
+                  value={row.priority ?? ""}
+                  onChange={(e) => onUpdateRow(row.ticket_id, "priority", e.target.value)}
+                  className="h-7 text-[10px] bg-amber-500/5 border-amber-500/20"
+                  placeholder="P1"
+                  title="Sprint priority (P1/P2…) — saved in sheet, not overwritten by Asana High/Medium/Low"
+                />
+              </td>
+              <td className="px-1 py-1 align-top">
+                <Input
+                  value={row.status ?? ""}
+                  onChange={(e) => onUpdateRow(row.ticket_id, "status", e.target.value)}
+                  className="h-7 text-[10px] bg-amber-500/5 border-amber-500/20"
+                  title={row.section_name || row.status || undefined}
+                />
               </td>
               <td className="px-2 py-1.5">
                 {row.asana_link ? (
@@ -184,8 +204,8 @@ function SprintSheetTable({ tableRows, onUpdateRow }: SprintSheetTableProps) {
                 )}
               </td>
               <td className="px-2 py-1.5">
-                {row.doc_link ? (
-                  <a href={row.doc_link} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                {isValidJiraBrowseLink(row.doc_link) ? (
+                  <a href={row.doc_link!} target="_blank" rel="noreferrer" className="text-primary hover:underline">
                     Open
                   </a>
                 ) : (
@@ -196,24 +216,16 @@ function SprintSheetTable({ tableRows, onUpdateRow }: SprintSheetTableProps) {
               <td className="px-2 py-1.5 text-muted-foreground">{row.dev_estimate ?? "—"}</td>
               {EDITABLE.map((col) => (
                 <td key={col.key} className="px-1 py-1">
-                  {col.key === "status" ? (
-                    <Input
-                      value={row.status ?? ""}
-                      onChange={(e) => onUpdateRow(row.ticket_id, col.key, e.target.value)}
-                      className="h-7 text-[10px] bg-amber-500/5 border-amber-500/20"
-                    />
-                  ) : (
-                    <Input
-                      value={
-                        col.key === "qa_estimate"
-                          ? row.qa_estimate ?? ""
-                          : (row[col.key] as string | null) ?? ""
-                      }
-                      onChange={(e) => onUpdateRow(row.ticket_id, col.key, e.target.value)}
-                      className="h-7 text-[10px] bg-amber-500/5 border-amber-500/20"
-                      placeholder={col.key === "dev_assigned" || col.key === "qa_assigned" ? "—" : undefined}
-                    />
-                  )}
+                  <Input
+                    value={
+                      col.key === "qa_estimate"
+                        ? row.qa_estimate ?? ""
+                        : (row[col.key] as string | null) ?? ""
+                    }
+                    onChange={(e) => onUpdateRow(row.ticket_id, col.key, e.target.value)}
+                    className="h-7 text-[10px] bg-amber-500/5 border-amber-500/20"
+                    placeholder={col.key === "dev_assigned" || col.key === "qa_assigned" ? "—" : undefined}
+                  />
                 </td>
               ))}
               <td className="px-2 py-1.5 font-medium">{row.total_estimate ?? "—"}</td>
@@ -328,8 +340,10 @@ export default function SprintSheetPage() {
     setError(null);
     invalidateCache("sprint-sheet", cacheScope);
     try {
-      await api.syncProject(projectGid);
-      const result = await api.getSprintSheet(projectGid, sprintName, true);
+      // Delta sync: only tasks changed since last sync (much faster than full project scrape).
+      await api.syncProject(projectGid, { incremental: true });
+      // Sheet was already rebuilt inside sync — avoid a second Google Sheets push.
+      const result = await api.getSprintSheet(projectGid, sprintName, false);
       applySheet(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Asana sync failed");
@@ -380,8 +394,8 @@ export default function SprintSheetPage() {
         if (key === "qa_estimate") {
           const num = value === "" ? null : Number(value);
           updated.qa_estimate = Number.isFinite(num) ? num : null;
-        } else if (key === "status") {
-          updated.status = value;
+        } else if (key === "priority" || key === "status") {
+          updated[key] = value;
         } else {
           updated[key] = value || null;
         }
@@ -475,6 +489,7 @@ export default function SprintSheetPage() {
             className="h-8 text-[10px]"
             onClick={() => void syncFromAsana()}
             disabled={loading || !projectGid}
+            title="Incremental: only tickets changed since last sync"
           >
             <RefreshCw className={cn("h-3 w-3 mr-1", loading && "animate-spin")} />
             Sync from Asana
@@ -585,9 +600,9 @@ export default function SprintSheetPage() {
                   {data.project_name ?? selectedProject?.name ?? "—"}
                 </p>
                 <p>
-                  Tickets are listed <strong>Done and in-progress first</strong>, counting down to
-                  Prioritized at the bottom — so you see what is finished or actively moving before
-                  what is still queued. Within each stage, order follows the Asana board.
+                  Tickets are listed <strong>Prioritized → Done</strong> in the app and on the
+                  Google Sheet, so you know what to start with. Within each stage, order matches
+                  the Asana board.
                 </p>
 
                 <div className="pt-1 border-t border-border/40 space-y-2">
@@ -679,8 +694,8 @@ export default function SprintSheetPage() {
                   <CardContent className="py-3 space-y-2">
                     <p className="text-sm font-medium">Sprint board ({displayRows.length})</p>
                     <p className="text-[10px] text-muted-foreground">
-                      Top = Done / furthest along (Testing Pre-Prod, Build in Pre-Prod, …). Bottom =
-                      Prioritized (not started yet). Priority column from Asana when set.
+                      Top = Prioritized (new / queued). Then Design → Developing → … → Done.
+                      Within each stage, order matches the Asana board. Priority column from Asana when set.
                     </p>
                     <SprintSheetTable tableRows={displayRows} onUpdateRow={updateRow} />
                   </CardContent>

@@ -57,6 +57,61 @@ def is_sprint_pipeline_section(name: str | None) -> bool:
     return normalize_section_name(name) in _PIPELINE_NORM
 
 
+def is_done_section(name: str | None) -> bool:
+    return normalize_section_name(name) == normalize_section_name("Done")
+
+
+def is_active_sprint_work_section(name: str | None) -> bool:
+    """Prioritized → … before Done (Developing, Testing, etc.). Excludes Done/Backlog/Released."""
+    return is_sprint_pipeline_section(name) and not is_done_section(name)
+
+
+def is_chat_status_move(from_section: str | None, to_section: str | None) -> bool:
+    """True only for real sprint-board moves inside Prioritized … before Done."""
+    if not from_section or not to_section:
+        return False
+    if from_section.strip().lower() == to_section.strip().lower():
+        return False
+    return is_active_sprint_work_section(from_section) and is_active_sprint_work_section(
+        to_section
+    )
+
+
+def is_testing_section(name: str | None) -> bool:
+    """True for UAT / Pre-Prod testing columns (ready for QA)."""
+    if not name:
+        return False
+    norm = normalize_section_name(name)
+    return "testing" in norm or norm in {
+        normalize_section_name("Build in UAT"),
+        normalize_section_name("Build in Pre Prod"),
+        normalize_section_name("Build in Pre-Prod"),
+    }
+
+
+def is_developing_section(name: str | None) -> bool:
+    if not name:
+        return False
+    norm = normalize_section_name(name)
+    return norm in {
+        normalize_section_name("Developing"),
+        normalize_section_name("PR Raised"),
+    }
+
+
+def is_highlight_status_move(from_section: str | None, to_section: str | None) -> bool:
+    """Dev→Test and arrivals at Done/Released — the moves offices care about most."""
+    if is_released_section(to_section):
+        return True
+    if normalize_section_name(to_section) == normalize_section_name("Done"):
+        return True
+    if is_testing_section(to_section) and (
+        not from_section or is_developing_section(from_section) or not is_testing_section(from_section)
+    ):
+        return True
+    return False
+
+
 def pipeline_section_order(name: str | None) -> int:
     norm = normalize_section_name(name)
     for idx, section in enumerate(SPRINT_PIPELINE_SECTIONS):
@@ -76,10 +131,13 @@ def sprint_sheet_display_sort_key(
     asana_board_index: int | None,
     ticket_id: int | None,
 ) -> tuple:
-    """Done / in-progress first, Prioritized last; board order within each column."""
+    """Prioritized → Done; Asana board order within each stage."""
     stage = pipeline_section_progress_rank(section_name)
+    # Unrecognized stages go after Done.
+    if stage < 0:
+        stage = 10_000
     board_idx = asana_board_index if asana_board_index is not None else 999999
-    return (-stage, board_idx, ticket_id or 0)
+    return (stage, board_idx, ticket_id or 0)
 
 
 def display_pipeline_status(section_name: str | None, sheet_status: str = "active") -> str:

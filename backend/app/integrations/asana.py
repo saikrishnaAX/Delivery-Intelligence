@@ -10,7 +10,7 @@ TASK_FIELDS = (
     "name,notes,completed,assignee.name,created_by.name,created_by.email,created_at,completed_at,modified_at,"
     "custom_fields,custom_fields.name,custom_fields.display_value,custom_fields.enum_value,"
     "custom_fields.text_value,custom_fields.number_value,custom_fields.multi_enum_values,tags,"
-    "memberships,memberships.section.name,permalink_url,due_on"
+    "memberships,memberships.section.name,permalink_url,due_on,parent,parent.gid"
 )
 
 
@@ -100,13 +100,21 @@ class AsanaClient:
                 break
         return [p for p in projects if not p.get("archived")]
 
-    async def fetch_project_tasks(self, project_gid: str) -> list[dict]:
+    async def fetch_project_tasks(
+        self,
+        project_gid: str,
+        *,
+        modified_since: str | None = None,
+    ) -> list[dict]:
+        """Fetch full task payloads. Pass modified_since (UTC ISO) for delta sync."""
         if not self.is_configured:
             return []
         tasks: list[dict] = []
         offset = None
         while True:
             params: dict = {"limit": 100, "opt_fields": TASK_FIELDS}
+            if modified_since:
+                params["modified_since"] = modified_since
             if offset:
                 params["offset"] = offset
             data = await self._get(f"/projects/{project_gid}/tasks", params)
@@ -116,6 +124,27 @@ class AsanaClient:
             if not offset:
                 break
         return tasks
+
+    async def fetch_project_task_gids(self, project_gid: str) -> set[str]:
+        """Lightweight membership scan — gids only (for removals / delta sync)."""
+        if not self.is_configured:
+            return set()
+        gids: set[str] = set()
+        offset = None
+        while True:
+            params: dict = {"limit": 100, "opt_fields": "gid"}
+            if offset:
+                params["offset"] = offset
+            data = await self._get(f"/projects/{project_gid}/tasks", params)
+            for task in data.get("data", []):
+                gid = task.get("gid")
+                if gid:
+                    gids.add(str(gid))
+            next_page = data.get("next_page") or {}
+            offset = next_page.get("offset")
+            if not offset:
+                break
+        return gids
 
     async def fetch_project_sections(self, project_gid: str) -> list[dict]:
         """Board sections for a project (includes Prioritized, Developing, etc.)."""
@@ -202,3 +231,21 @@ class AsanaClient:
             except httpx.HTTPStatusError:
                 detailed.append(att)
         return detailed
+
+    async def fetch_task_subtasks(self, task_gid: str) -> list[dict]:
+        """Subtasks under a parent — used to roll up Dev/QA estimates."""
+        if not self.is_configured:
+            return []
+        subtasks: list[dict] = []
+        offset = None
+        while True:
+            params: dict = {"limit": 100, "opt_fields": TASK_FIELDS}
+            if offset:
+                params["offset"] = offset
+            data = await self._get(f"/tasks/{task_gid}/subtasks", params)
+            subtasks.extend(data.get("data", []))
+            next_page = data.get("next_page") or {}
+            offset = next_page.get("offset")
+            if not offset:
+                break
+        return subtasks

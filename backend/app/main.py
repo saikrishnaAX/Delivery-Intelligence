@@ -15,6 +15,7 @@ from app.seed.mock_data import seed_database
 from app.migrate import migrate
 from app.services.auto_sync import auto_sync_loop
 from app.services.asana_webhooks import ensure_asana_webhooks
+from app.services.jira_webhooks import ensure_jira_webhooks
 
 settings = get_settings()
 _auto_sync_task: asyncio.Task | None = None
@@ -50,6 +51,18 @@ async def lifespan(app: FastAPI):
                 logger.info("Asana webhooks: %s", webhook_result)
             except Exception:
                 logger.exception("Asana webhook registration failed")
+            try:
+                jira_hooks = await ensure_jira_webhooks()
+                logger.info("Jira webhooks: %s", jira_hooks)
+            except Exception:
+                logger.exception("Jira webhook registration failed")
+    elif settings.asana_webhook_target_url.strip() and settings.jira_configured:
+        # Public URL set but Asana auto-sync off — still try Jira hooks.
+        try:
+            jira_hooks = await ensure_jira_webhooks()
+            logger.info("Jira webhooks: %s", jira_hooks)
+        except Exception:
+            logger.exception("Jira webhook registration failed")
     yield
     if _auto_sync_task:
         _auto_sync_task.cancel()

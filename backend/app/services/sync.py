@@ -1,7 +1,7 @@
 """Sync Asana projects/tasks and Jira issues into the local database."""
 
 import asyncio
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil import parser as date_parser
 from sqlalchemy.orm import Session
@@ -24,6 +24,13 @@ from app.services.ticket_parser import (
 from app.services.section_tracking import record_section_change, backfill_project_releases
 from app.services.section_utils import is_sprint_pipeline_section
 from app.services.insights_generator import generate_insights
+from app.services.status_move_notifier import StatusMoveEvent, notify_status_moves
+from app.services.subtask_estimates import (
+    parent_gids_from_synced_tasks,
+    pipeline_parent_gids,
+    sync_subtask_estimates,
+    _parent_gid,
+)
 
 settings = get_settings()
 
@@ -172,7 +179,12 @@ class SyncService:
         self.db.commit()
         return self.db.query(AsanaProject).order_by(AsanaProject.name).all()
 
-    async def sync_asana_project(self, project_gid: str) -> dict:
+    async def sync_asana_project(
+        self,
+        project_gid: str,
+        *,
+        incremental: bool = False,
+    ) -> dict:
         project = self.get_project_by_gid(project_gid)
         if not project:
             remote = await self.asana.fetch_projects()
@@ -188,13 +200,29 @@ class SyncService:
             self.db.add(project)
             self.db.flush()
 
+        # First sync (or no watermark) must be full — otherwise we'd miss existing tickets.
+        use_incremental = bool(incremental and project.last_synced_at)
+        modified_since: str | None = None
+        if use_incremental and project.last_synced_at:
+            # Small overlap so we don't miss updates that happened during the last sync.
+            watermark = project.last_synced_at - timedelta(minutes=2)
+            modified_since = watermark.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
         try:
-            tasks = await self.asana.fetch_project_tasks(project_gid)
-            synced_gids = {task["gid"] for task in tasks}
+            tasks = await self.asana.fetch_project_tasks(
+                project_gid, modified_since=modified_since
+            )
+            if use_incremental:
+                # Full membership is cheap (gid only) and keeps removals / sheet cleanup correct.
+                synced_gids = await self.asana.fetch_project_task_gids(project_gid)
+            else:
+                synced_gids = {task["gid"] for task in tasks}
+
             board_index_by_gid = await _board_index_for_project(self.asana, project_gid)
 
             synced = 0
             batch_size = 25
+            status_moves: list[StatusMoveEvent] = []
 
             for task in tasks:
                 gid = task["gid"]
@@ -216,6 +244,7 @@ class SyncService:
                 workshop_id = extract_workshop_id(notes, workshop_field)
 
                 section = _section_name(task)
+                parent_asana_gid = _parent_gid(task)
                 module = _get_or_create_module(self.db, section, project.id)
                 customer = _get_or_create_customer(self.db, workshop_name)
 
@@ -254,6 +283,9 @@ class SyncService:
                 build_in = parse_custom_field(custom_fields, "Build In")
                 dor_value = parse_custom_field(custom_fields, "DoR")
                 jira_key = extract_jira_key(title, notes, settings.jira_project_key)
+                # Reuse known Jira links — attachment probing is the main sync bottleneck.
+                if not jira_key and existing and existing.jira_key:
+                    jira_key = existing.jira_key
                 if not jira_key:
                     attachments = await self.asana.fetch_task_attachments(gid)
                     jira_key = extract_jira_key_from_attachments(attachments, settings.jira_project_key)
@@ -293,6 +325,7 @@ class SyncService:
                     build_in=build_in,
                     dor_value=dor_value,
                     asana_board_index=board_index_by_gid.get(gid),
+                    parent_asana_gid=parent_asana_gid,
                     removed_from_asana=False,
                     created_at=created,
                     closed_at=closed,
@@ -307,14 +340,39 @@ class SyncService:
                     self.db.add(ticket_row)
                 flush_with_retry(self.db)
 
-                if section != (old_section or ""):
+                if section != (old_section or "") and not parent_asana_gid:
                     await record_section_change(
                         self.db, ticket_row, old_section, section, self.asana,
                     )
+                    if old_section:
+                        status_moves.append(
+                            StatusMoveEvent(
+                                title=ticket_row.title or title,
+                                from_section=old_section,
+                                to_section=section,
+                                jira_key=ticket_row.jira_key,
+                                asana_url=ticket_row.asana_url,
+                                assignee=ticket_row.assignee,
+                            )
+                        )
 
                 synced += 1
                 if synced % batch_size == 0:
                     commit_with_retry(self.db)
+
+            # Refresh board order for unchanged tickets too (cheap local update).
+            if board_index_by_gid:
+                for ticket in (
+                    self.db.query(Ticket)
+                    .filter(
+                        Ticket.project_id == project.id,
+                        Ticket.asana_gid.in_(list(board_index_by_gid.keys())),
+                    )
+                    .all()
+                ):
+                    idx = board_index_by_gid.get(ticket.asana_gid)
+                    if idx is not None and ticket.asana_board_index != idx:
+                        ticket.asana_board_index = idx
 
             if synced_gids:
                 stale = (
@@ -322,6 +380,7 @@ class SyncService:
                     .filter(
                         Ticket.project_id == project.id,
                         Ticket.asana_gid.isnot(None),
+                        Ticket.parent_asana_gid.is_(None),
                         Ticket.asana_gid.notin_(synced_gids),
                         Ticket.removed_from_asana.is_(False),
                     )
@@ -331,22 +390,54 @@ class SyncService:
                     ticket.removed_from_asana = True
                     ticket.updated_at = datetime.utcnow()
 
-            await backfill_project_releases(self.db, project.id, self.asana)
+            if use_incremental:
+                subtask_parents = parent_gids_from_synced_tasks(tasks)
+            else:
+                subtask_parents = pipeline_parent_gids(self.db, project.id)
+            try:
+                await sync_subtask_estimates(
+                    self.db, self.asana, project.id, subtask_parents
+                )
+            except Exception:
+                import logging
+                logging.getLogger(__name__).exception(
+                    "Subtask estimate sync failed for %s", project_gid
+                )
+
+            if not use_incremental:
+                await backfill_project_releases(self.db, project.id, self.asana)
             link_jira_asana_tickets(self.db)
             project.ticket_count = self.db.query(Ticket).filter(Ticket.project_id == project.id).count()
             project.last_synced_at = datetime.utcnow()
             commit_with_retry(self.db)
 
             clusters_created = 0
+            if not use_incremental:
+                try:
+                    from app.services.clustering import run_semantic_clustering
+                    clusters_created = run_semantic_clustering(self.db, project.id)
+                except Exception:
+                    pass
+                try:
+                    generate_insights(self.db, project.id, date_from=datetime(2026, 2, 1))
+                except Exception:
+                    pass
+
+            notify_result = {}
             try:
-                from app.services.clustering import run_semantic_clustering
-                clusters_created = run_semantic_clustering(self.db, project.id)
+                # Tech-team alerts: Sprint Planning board only (not support / other projects).
+                name_l = (project.name or "").lower()
+                if "sprint" in name_l and "planning" in name_l:
+                    notify_result = await notify_status_moves(project.name, status_moves)
+                else:
+                    notify_result = {
+                        "skipped_reason": "not_sprint_planning",
+                        "filtered_count": 0,
+                        "chat_sent": False,
+                        "email_sent": False,
+                    }
             except Exception:
-                pass
-            try:
-                generate_insights(self.db, project.id, date_from=datetime(2026, 2, 1))
-            except Exception:
-                pass
+                notify_result = {"error": "status_move_notify_failed"}
 
             return {
                 "success": True,
@@ -355,6 +446,9 @@ class SyncService:
                 "tasks_synced": synced,
                 "total_in_project": project.ticket_count,
                 "clusters_created": clusters_created,
+                "incremental": use_incremental,
+                "modified_since": modified_since,
+                "status_moves": notify_result,
             }
         finally:
             await self.asana.close()
@@ -406,6 +500,10 @@ class SyncService:
 
         issues = await self.jira.fetch_project_issues(jira_key)
         synced = 0
+        new_bug_events: list = []
+        # key -> summary for parent lookup after the loop
+        known_summaries: dict[str, str] = {}
+        pending_bugs: list[dict] = []
 
         for issue in issues:
             key = issue["key"]
@@ -415,17 +513,30 @@ class SyncService:
             assignee = (fields.get("assignee") or {}).get("displayName")
             summary = fields.get("summary")
             story_points = fields.get("customfield_10016")
+            parent = fields.get("parent") or {}
+            parent_key = (parent.get("key") or "").strip() or None
+            parent_summary = None
+            if parent_key:
+                parent_fields = parent.get("fields") or {}
+                parent_summary = (parent_fields.get("summary") or "").strip() or None
+            if summary:
+                known_summaries[key] = summary
+            if parent_key and parent_summary:
+                known_summaries[parent_key] = parent_summary
 
             existing = self.db.query(JiraIssue).filter(JiraIssue.jira_key == key).first()
+            is_new = existing is None
+            jira_url = f"{settings.jira_base_url.rstrip('/')}/browse/{key}"
             data = dict(
                 summary=summary,
                 status=status,
                 issue_type=issue_type,
+                parent_jira_key=parent_key,
                 assignee=assignee,
                 story_points=story_points,
                 sprint_name=None,
                 sprint_state=None,
-                jira_url=f"{settings.jira_base_url.rstrip('/')}/browse/{key}",
+                jira_url=jira_url,
                 project_id=asana_project_id,
                 project_key=jira_key,
                 synced_at=datetime.utcnow(),
@@ -435,10 +546,67 @@ class SyncService:
                     setattr(existing, k, v)
             else:
                 self.db.add(JiraIssue(jira_key=key, ticket_id=None, **data))
+
+            if is_new and parent_key:
+                from app.services.jira_bug_notifier import (
+                    description_snippet,
+                    is_notifiable_bug_subtask,
+                )
+
+                if is_notifiable_bug_subtask(parent_key=parent_key, issue_type=issue_type):
+                    pending_bugs.append(
+                        {
+                            "bug_key": key,
+                            "bug_summary": summary or "",
+                            "bug_url": jira_url,
+                            "parent_key": parent_key,
+                            "parent_summary": parent_summary,
+                            "parent_url": f"{settings.jira_base_url.rstrip('/')}/browse/{parent_key}",
+                            "assignee": assignee,
+                            "issue_type": issue_type,
+                            "status": status,
+                            "description": description_snippet(fields.get("description")),
+                        }
+                    )
             synced += 1
 
         self.db.commit()
         linked = link_jira_asana_tickets(self.db)
+
+        notify_result = {}
+        if pending_bugs:
+            from app.services.jira_bug_notifier import JiraBugSubtaskEvent, notify_jira_bug_subtasks
+
+            for item in pending_bugs:
+                parent_key = item["parent_key"]
+                parent_summary = item["parent_summary"] or known_summaries.get(parent_key)
+                if not parent_summary:
+                    parent_row = (
+                        self.db.query(JiraIssue)
+                        .filter(JiraIssue.jira_key == parent_key)
+                        .first()
+                    )
+                    parent_summary = parent_row.summary if parent_row else None
+                new_bug_events.append(
+                    JiraBugSubtaskEvent(
+                        bug_key=item["bug_key"],
+                        bug_summary=item["bug_summary"],
+                        bug_url=item["bug_url"],
+                        parent_key=parent_key,
+                        action="created",
+                        status=item.get("status"),
+                        parent_summary=parent_summary,
+                        parent_url=item["parent_url"],
+                        assignee=item["assignee"],
+                        issue_type=item["issue_type"],
+                        description=item.get("description"),
+                    )
+                )
+            try:
+                notify_result = await notify_jira_bug_subtasks(new_bug_events)
+            except Exception:
+                notify_result = {"error": "jira_bug_notify_failed"}
+
         project_name = None
         if asana_project_id:
             proj = self.db.query(AsanaProject).filter(AsanaProject.id == asana_project_id).first()
@@ -449,12 +617,14 @@ class SyncService:
             "issues_synced": synced,
             "linked_to": project_name,
             "linked_count": linked,
+            "new_bug_subtasks": notify_result,
         }
 
-    async def sync_all(self, project_gid: str) -> dict:
-        asana_result = await self.sync_asana_project(project_gid)
+    async def sync_all(self, project_gid: str, *, incremental: bool = False) -> dict:
+        asana_result = await self.sync_asana_project(project_gid, incremental=incremental)
         if not asana_result.get("success"):
             return asana_result
+        # Always pull Jira so new bug sub-tasks can alert the Bugs Chat space.
         jira_result = await self.sync_jira_for_project(project_gid)
         return {
             "success": True,
@@ -466,6 +636,7 @@ class SyncService:
         from app.services.auto_sync import get_meta
         from app.services import google_sheets_sync as gsync
         from app.services.asana_webhooks import webhook_target_url
+        from app.services.jira_webhooks import jira_webhook_target_url
 
         cfg = get_settings()
         return {
@@ -481,6 +652,7 @@ class SyncService:
             "auto_sync_interval_minutes": settings.auto_sync_interval_minutes,
             "auto_sync_ui_poll_seconds": settings.auto_sync_ui_poll_seconds,
             "asana_webhooks_enabled": bool(webhook_target_url()),
+            "jira_webhooks_enabled": bool(jira_webhook_target_url()),
             "email_configured": cfg.email_configured,
             "last_auto_sync_at": get_meta(self.db, "last_auto_sync_at"),
         }

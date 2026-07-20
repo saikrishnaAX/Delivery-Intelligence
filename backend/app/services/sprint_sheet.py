@@ -25,6 +25,11 @@ from app.services.section_utils import (
 )
 from app.services.ticket_parser import clean_title_for_release, extract_jira_key, jira_browse_url
 from app.services.work_type import classify_work_type, work_type_bucket
+from app.services.subtask_estimates import (
+    apply_subtask_estimate_rollup,
+    child_estimate_rollup_by_parent,
+    is_subtask_ticket,
+)
 
 settings = get_settings()
 
@@ -51,40 +56,73 @@ def _display_asana_priority(ticket: Ticket) -> str | None:
     return raw or None
 
 
+# Column order & labels match the Sprint Sheet UI table exactly.
 SPRINT_COLUMNS = [
     ("title", "Ticket"),
     ("ticket_type", "Type"),
     ("priority", "Priority"),
-    ("asana_link", "Asana Link"),
-    ("doc_link", "Jira Link"),
+    ("status", "Status"),
+    ("asana_link", "Asana"),
+    ("doc_link", "Jira"),
     ("jira_status", "Jira Status"),
-    ("dev_estimate", "Dev Est (hrs)"),
-    ("qa_estimate", "QA Est (hrs)"),
-    ("total_estimate", "Total Est (hrs)"),
+    ("dev_estimate", "Dev Est"),
+    ("qa_estimate", "QA Est"),
     ("dev_assigned", "Dev Assigned"),
     ("qa_assigned", "QA Assigned"),
-    ("status", "Status"),
+    ("total_estimate", "Total"),
 ]
 
 
-def _extract_jira_link(title: str, description: str, jira_key: str | None) -> str | None:
+def _candidate_jira_key(ticket: Ticket, title: str, description: str) -> str | None:
+    """Best Jira key guess from ticket fields / Asana text — not yet verified."""
+    if ticket.jira_key:
+        return ticket.jira_key.strip().upper()
     text = f"{title}\n{description or ''}"
     match = JIRA_URL_PATTERN.search(text)
     if match:
-        return match.group(0).rstrip(".,;")
-    if jira_key:
-        return jira_browse_url(jira_key)
-    key = extract_jira_key(title, description, settings.jira_project_key)
-    return jira_browse_url(key)
+        key_part = match.group(0).rstrip(".,;").rsplit("/browse/", 1)[-1]
+        if re.match(r"^[A-Z][A-Z0-9]+-\d+$", key_part, flags=re.I):
+            return key_part.upper()
+    return extract_jira_key(title, description, settings.jira_project_key)
 
 
-def _jira_status_for_ticket(ticket: Ticket, jira_by_key: dict[str, JiraIssue]) -> str | None:
-    if ticket.jira_issue:
-        return ticket.jira_issue.status
-    if ticket.jira_key:
-        issue = jira_by_key.get(ticket.jira_key.upper())
-        return issue.status if issue else None
-    return None
+def _verified_jira_issue(
+    ticket: Ticket,
+    title: str,
+    description: str,
+    jira_by_key: dict[str, JiraIssue],
+) -> JiraIssue | None:
+    """Only return a Jira issue that exists in our synced Jira data (no dummy links)."""
+    if ticket.jira_issue is not None:
+        return ticket.jira_issue
+    key = _candidate_jira_key(ticket, title, description)
+    if not key:
+        return None
+    return jira_by_key.get(key.upper())
+
+
+def _jira_link_for_ticket(
+    ticket: Ticket,
+    title: str,
+    description: str,
+    jira_by_key: dict[str, JiraIssue],
+) -> str | None:
+    issue = _verified_jira_issue(ticket, title, description, jira_by_key)
+    if not issue:
+        return None
+    if issue.jira_url and re.search(r"/browse/[A-Z][A-Z0-9]+-\d+$", issue.jira_url, re.I):
+        return issue.jira_url
+    return jira_browse_url(issue.jira_key)
+
+
+def _jira_status_for_ticket(
+    ticket: Ticket,
+    title: str,
+    description: str,
+    jira_by_key: dict[str, JiraIssue],
+) -> str | None:
+    issue = _verified_jira_issue(ticket, title, description, jira_by_key)
+    return issue.status if issue else None
 
 
 def _ticket_base_row(
@@ -92,11 +130,14 @@ def _ticket_base_row(
     section: str,
     sheet_status: str,
     jira_by_key: dict[str, JiraIssue] | None = None,
+    subtask_rollups: dict[str, dict] | None = None,
 ) -> dict:
     title = clean_title_for_release(ticket.title, ticket.workshop_name)
     dev = ticket.dev_effort_hours
     qa = ticket.qa_effort_hours
     total = ticket.total_effort_hours
+    rollup = (subtask_rollups or {}).get(ticket.asana_gid or "")
+    dev, qa, total = apply_subtask_estimate_rollup(dev, qa, total, rollup)
     if total is None and (dev is not None or qa is not None):
         total = (dev or 0) + (qa or 0)
     status_label = display_pipeline_status(section, sheet_status)
@@ -117,8 +158,8 @@ def _ticket_base_row(
         "qa_estimate": qa,
         "total_estimate": total,
         "status": status_label,
-        "doc_link": _extract_jira_link(title, ticket.description or "", ticket.jira_key),
-        "jira_status": _jira_status_for_ticket(ticket, jira_lookup),
+        "doc_link": _jira_link_for_ticket(ticket, title, ticket.description or "", jira_lookup),
+        "jira_status": _jira_status_for_ticket(ticket, title, ticket.description or "", jira_lookup),
         "asana_link": ticket.asana_url,
         "dev_assigned": None,
         "qa_assigned": None,
@@ -133,7 +174,9 @@ def _merge_row(base: dict, saved: dict | None) -> dict:
     if not saved:
         return base
     merged = {**base}
+    # User-owned fields — never wipe with Asana defaults on merge.
     manual_keys = (
+        "priority",
         "status",
         "qa_estimate",
         "dev_assigned",
@@ -157,13 +200,14 @@ def _hydrate_row_from_ticket(
     row: dict,
     ticket: Ticket | None,
     jira_by_key: dict[str, JiraIssue] | None = None,
+    subtask_rollups: dict[str, dict] | None = None,
 ) -> dict:
-    """Always restore ticket title and type from Asana — never show type-only rows."""
+    """Restore live Asana fields; keep user Priority (and manual Status) when set."""
     if not ticket:
         return row
     section = ticket.module.name if ticket.module else (row.get("section_name") or "Unknown")
     sheet_status = row.get("sheet_status") or "active"
-    base = _ticket_base_row(ticket, section, sheet_status, jira_by_key)
+    base = _ticket_base_row(ticket, section, sheet_status, jira_by_key, subtask_rollups)
     out = {**row}
     out["section_name"] = section
     out["title"] = base["title"] or ticket.title or "Untitled ticket"
@@ -176,7 +220,11 @@ def _hydrate_row_from_ticket(
     if out.get("total_estimate") is None:
         out["total_estimate"] = base["total_estimate"]
     out["asana_board_index"] = ticket.asana_board_index
-    out["priority"] = base["priority"]
+    # Priority: P1/P2/etc edits stick; only seed from Asana when empty.
+    saved_priority = (out.get("priority") if out.get("priority") is not None else "")
+    saved_priority = str(saved_priority).strip()
+    out["priority"] = saved_priority or base["priority"]
+    # Status always follows the live Asana board section.
     out["status"] = base["status"]
     return out
 
@@ -197,7 +245,7 @@ def _prioritized_board_rows(rows: list[dict]) -> list[dict]:
 
 
 def _row_sort_key(row: dict) -> tuple:
-    """Done and in-progress stages first; Prioritized (not started) last."""
+    """Prioritized → Done; board order within each stage (app + Google Sheet)."""
     return sprint_sheet_display_sort_key(
         row.get("section_name"),
         row.get("asana_board_index"),
@@ -304,12 +352,17 @@ class SprintSheetService:
 
         prioritized_gids = {
             t.asana_gid for t in all_tickets
-            if t.module and is_sprint_pipeline_section(t.module.name)
+            if t.asana_gid
+            and not is_subtask_ticket(t)
+            and t.module
+            and is_sprint_pipeline_section(t.module.name)
         }
+
+        subtask_rollups = child_estimate_rollup_by_parent(self.db, project.id)
 
         for ticket in all_tickets:
             gid = ticket.asana_gid
-            if not gid:
+            if not gid or is_subtask_ticket(ticket):
                 continue
             section = self._ticket_section(ticket)
             saved = saved_rows.get(gid)
@@ -326,7 +379,7 @@ class SprintSheetService:
             if saved is None and sheet_status == "removed":
                 continue
 
-            base = _ticket_base_row(ticket, section, sheet_status, jira_by_key)
+            base = _ticket_base_row(ticket, section, sheet_status, jira_by_key, subtask_rollups)
             merged = _merge_row(base, saved.row_data if saved else None)
 
             if saved:
@@ -345,6 +398,9 @@ class SprintSheetService:
 
         for gid, saved in saved_rows.items():
             if gid in prioritized_gids:
+                continue
+            if saved.ticket and is_subtask_ticket(saved.ticket):
+                self.db.delete(saved)
                 continue
             ticket_gone = saved.ticket and saved.ticket.removed_from_asana
             if saved.sheet_status in ("active", "in_sprint", "released") or ticket_gone:
@@ -372,7 +428,7 @@ class SprintSheetService:
                 continue
             db_row = by_gid[gid]
             merged = {**(db_row.row_data or {})}
-            for key in ("status", "qa_estimate", "dev_assigned", "qa_assigned"):
+            for key in ("priority", "status", "qa_estimate", "dev_assigned", "qa_assigned"):
                 if key in item:
                     merged[key] = item[key]
             dev = merged.get("dev_estimate")
@@ -442,11 +498,12 @@ class SprintSheetService:
         )
         rows = []
         jira_by_key = {ji.jira_key.upper(): ji for ji in self.db.query(JiraIssue).all()}
+        subtask_rollups = child_estimate_rollup_by_parent(self.db, project.id)
         for r in db_rows:
             row = dict(r.row_data or {})
             row["sheet_status"] = r.sheet_status
             row["sheet_row_id"] = r.id
-            row = _hydrate_row_from_ticket(row, r.ticket, jira_by_key)
+            row = _hydrate_row_from_ticket(row, r.ticket, jira_by_key, subtask_rollups)
             rows.append(row)
         self._refresh_jira_on_rows(rows)
         rows.sort(key=_row_sort_key)
@@ -500,8 +557,8 @@ class SprintSheetService:
             row["title"] = title
             row["ticket_type"] = type_label
             row["work_type"] = work_type
-            row["doc_link"] = _extract_jira_link(title, ticket.description or "", ticket.jira_key)
-            row["jira_status"] = _jira_status_for_ticket(ticket, jira_by_key)
+            row["doc_link"] = _jira_link_for_ticket(ticket, title, ticket.description or "", jira_by_key)
+            row["jira_status"] = _jira_status_for_ticket(ticket, title, ticket.description or "", jira_by_key)
 
     def link_google_sheet(self, sprint_name: str, spreadsheet_url: str) -> dict:
         project = self._project()
@@ -594,12 +651,13 @@ class SprintSheetService:
             .all()
         )
         jira_by_key = {ji.jira_key.upper(): ji for ji in self.db.query(JiraIssue).all()}
+        subtask_rollups = child_estimate_rollup_by_parent(self.db, project.id)
         for db_row in db_rows:
             incoming = by_gid.get(db_row.asana_gid)
             if not incoming:
                 continue
             merged = _merge_row(
-                _hydrate_row_from_ticket(db_row.row_data or {}, db_row.ticket, jira_by_key),
+                _hydrate_row_from_ticket(db_row.row_data or {}, db_row.ticket, jira_by_key, subtask_rollups),
                 incoming,
             )
             if incoming.get("sheet_status"):
@@ -702,6 +760,11 @@ def sync_all_sprint_sheets(db: Session, project_gid: str) -> list[dict]:
     svc = SprintSheetService(db, project_gid)
     results = []
     for sheet in sheets:
+        # Skip half-typed names from the sprint name input (e.g. "Jul", "July 2").
+        # Only sync real sprint sheets: linked to Google, or full-looking names.
+        name = (sheet.name or "").strip()
+        if not sheet.google_spreadsheet_id and len(name) < 6:
+            continue
         try:
             svc.build(sprint_name=sheet.name, refresh=True)
             results.append({"sprint": sheet.name, "success": True})

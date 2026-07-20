@@ -1,5 +1,6 @@
-import { RefreshCw, ChevronDown, Circle } from "lucide-react";
+import { RefreshCw, ChevronDown, Circle, Play } from "lucide-react";
 import { useProject } from "@/hooks/use-project";
+import { useBackendLauncher } from "@/hooks/use-backend-launcher";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/date-picker";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,12 @@ export function ProjectBar() {
     syncProject,
     loadingProjects,
     apiError,
+    refreshProjects,
   } = useProject();
+
+  const { devAvailable, isStarting, message: launcherMessage, start: startBackend } = useBackendLauncher(
+    refreshProjects
+  );
 
   const liveMode = integrationStatus && !integrationStatus.mock_mode && integrationStatus.asana_configured;
 
@@ -131,9 +137,27 @@ export function ProjectBar() {
         </p>
       )}
       {apiError && (
-        <p className="text-[10px] text-destructive mt-1.5">
-          {apiError} — run backend on port <strong>8003</strong>, then refresh this page.
-        </p>
+        <div className="flex flex-wrap items-center gap-2 mt-1.5">
+          <p className="text-[10px] text-destructive">
+            {apiError}
+            {devAvailable ? " — click Run backend to start it automatically." : " — run backend on port 8003, then refresh."}
+          </p>
+          {devAvailable && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={startBackend}
+              disabled={isStarting}
+              className="h-7 text-[10px] gap-1.5"
+            >
+              <Play className={cn("h-3 w-3", isStarting && "animate-pulse")} />
+              {isStarting ? "Starting backend…" : "Run backend"}
+            </Button>
+          )}
+        </div>
+      )}
+      {launcherMessage && (
+        <p className="text-[10px] text-muted-foreground mt-1.5">{launcherMessage}</p>
       )}
       {syncError && (
         <p className="text-[10px] text-destructive mt-1.5">{syncError}</p>

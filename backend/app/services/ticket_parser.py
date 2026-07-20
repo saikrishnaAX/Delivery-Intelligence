@@ -72,12 +72,16 @@ def extract_jira_key_from_attachments(
 
 
 def jira_browse_url(jira_key: str | None) -> str | None:
-    if not jira_key:
+    key = (jira_key or "").strip()
+    if not key or key.lower() in {"none", "null", "n/a", "-"}:
+        return None
+    # Reject malformed keys that would open Jira with no issue.
+    if not re.match(r"^[A-Z][A-Z0-9]+-\d+$", key, flags=re.IGNORECASE):
         return None
     from app.config import get_settings
     cfg = get_settings()
     base = (cfg.jira_base_url or "https://autorox.atlassian.net").rstrip("/")
-    return f"{base}/browse/{jira_key}"
+    return f"{base}/browse/{key.upper()}"
 
 WORKFLOW_KEYWORDS = {
     "invoice": "billing & invoicing",

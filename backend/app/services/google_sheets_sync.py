@@ -16,31 +16,61 @@ settings = get_settings()
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
-SPRINT_COLUMNS = [
-    ("title", "Ticket"),
-    ("ticket_type", "Type"),
-    ("priority", "Priority"),
-    ("asana_link", "Asana Link"),
-    ("doc_link", "Jira Link"),
-    ("jira_status", "Jira Status"),
-    ("dev_estimate", "Dev Est (hrs)"),
-    ("qa_estimate", "QA Est (hrs)"),
-    ("total_estimate", "Total Est (hrs)"),
-    ("dev_assigned", "Dev Assigned"),
-    ("qa_assigned", "QA Assigned"),
-    ("status", "Status"),
-]
-
-# Hidden key column + export columns (matches sprint_sheet.SPRINT_COLUMNS)
-HEADER_KEYS = ["asana_gid"] + [key for key, _ in SPRINT_COLUMNS]
-HEADER_LABELS = ["Asana GID"] + [label for _, label in SPRINT_COLUMNS]
-
 PULL_FIELDS = {
+    "priority",
     "qa_estimate",
     "dev_assigned",
     "qa_assigned",
     "status",
 }
+
+# Accept current + older Google header labels when pulling manual edits.
+PULL_HEADER_ALIASES = {
+    "asana link": "asana_link",
+    "asana": "asana_link",
+    "jira link": "doc_link",
+    "jira": "doc_link",
+    "dev est (hrs)": "dev_estimate",
+    "dev est": "dev_estimate",
+    "qa est (hrs)": "qa_estimate",
+    "qa est": "qa_estimate",
+    "total est (hrs)": "total_estimate",
+    "total": "total_estimate",
+    "priority": "priority",
+    "status": "status",
+    "dev assigned": "dev_assigned",
+    "qa assigned": "qa_assigned",
+    "asana gid": "asana_gid",
+    "ticket": "title",
+    "type": "ticket_type",
+    "jira status": "jira_status",
+}
+
+
+def _column_defs() -> list[tuple[str, str]]:
+    """Always read from sprint_sheet so Google columns match the app table."""
+    from app.services.sprint_sheet import SPRINT_COLUMNS
+
+    return list(SPRINT_COLUMNS)
+
+
+def _header_keys() -> list[str]:
+    return ["asana_gid"] + [key for key, _ in _column_defs()]
+
+
+def _header_labels() -> list[str]:
+    return ["Asana GID"] + [label for _, label in _column_defs()]
+
+
+# Back-compat for scripts that import HEADER_LABELS at module load.
+def __getattr__(name: str):
+    if name == "HEADER_LABELS":
+        return _header_labels()
+    if name == "HEADER_KEYS":
+        return _header_keys()
+    if name == "SPRINT_COLUMNS":
+        return _column_defs()
+    raise AttributeError(name)
 
 SPREADSHEET_ID_RE = re.compile(r"/spreadsheets/d/([a-zA-Z0-9-_]+)")
 GID_IN_URL_RE = re.compile(r"gid=(\d+)")
@@ -123,6 +153,14 @@ def _ensure_tab(service, spreadsheet_id: str, tab_name: str) -> str:
 def _payload_to_values(payload: dict) -> list[list[Any]]:
     from app.services.sprint_sheet import _row_sort_key
 
+    columns = _column_defs()
+    headers = _header_labels()
+    # Hard guarantee: Status sits immediately after Priority (same as app UI).
+    labels_only = [label for _, label in columns]
+    assert labels_only[:4] == ["Ticket", "Type", "Priority", "Status"], (
+        f"Sprint sheet columns drifted from app UI: {labels_only[:4]}"
+    )
+
     totals = payload.get("totals") or {}
     rows_out: list[list[Any]] = [
         [
@@ -138,7 +176,7 @@ def _payload_to_values(payload: dict) -> list[list[Any]]:
             f"QA: {totals.get('qa_hours', 0):.0f}h",
             "Edit yellow columns in app or sheet — both stay in sync",
         ],
-        HEADER_LABELS,
+        headers,
     ]
 
     active_rows = [
@@ -149,7 +187,7 @@ def _payload_to_values(payload: dict) -> list[list[Any]]:
 
     for row in active_rows:
         line: list[Any] = [row.get("asana_gid")]
-        for key, _ in SPRINT_COLUMNS:
+        for key, _ in columns:
             val = row.get(key)
             line.append("" if val is None else val)
         rows_out.append(line)
@@ -175,6 +213,8 @@ def push_sheet(spreadsheet_id: str, tab_name: str, payload: dict) -> datetime:
 
 
 def _format_sheet(service, spreadsheet_id: str, tab: str, row_count: int) -> None:
+    """Light formatting only — do not reset column widths/visibility (user layout is preserved)."""
+    headers = _header_labels()
     meta = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
     sheet_id = next(
         s["properties"]["sheetId"]
@@ -195,7 +235,7 @@ def _format_sheet(service, spreadsheet_id: str, tab: str, row_count: int) -> Non
                     "startRowIndex": 2,
                     "endRowIndex": 3,
                     "startColumnIndex": 0,
-                    "endColumnIndex": len(HEADER_LABELS),
+                    "endColumnIndex": len(headers),
                 },
                 "cell": {
                     "userEnteredFormat": {
@@ -206,20 +246,19 @@ def _format_sheet(service, spreadsheet_id: str, tab: str, row_count: int) -> Non
                 "fields": "userEnteredFormat(backgroundColor,textFormat)",
             }
         },
-    ]
-    # Hide Asana GID column (A)
-    requests.append(
+        # Keep Asana GID key column hidden; leave all other column sizes as the user set them.
         {
             "updateDimensionProperties": {
                 "range": {"sheetId": sheet_id, "dimension": "COLUMNS", "startIndex": 0, "endIndex": 1},
                 "properties": {"hiddenByUser": True},
                 "fields": "hiddenByUser",
             }
-        }
-    )
+        },
+    ]
     if row_count > 3:
-        # QA est, Dev assigned, QA assigned, Status — light yellow (editable)
-        for col in (7, 9, 10, 11):
+        # Editable yellow: Priority, Status, QA Est, Dev Assigned, QA Assigned
+        # 0=gid … 3=priority, 4=status, 9=qa, 10=dev_as, 11=qa_as, 12=total
+        for col in (3, 4, 9, 10, 11):
             requests.append(
                 {
                     "repeatCell": {
@@ -262,17 +301,12 @@ def pull_sheet(spreadsheet_id: str, tab_name: str) -> list[dict[str, Any]]:
     key_by_col: dict[int, str] = {}
     for col_idx, label in enumerate(header_row):
         label_norm = (label or "").strip().lower()
-        for key, hdr in zip(HEADER_KEYS, HEADER_LABELS):
-            if hdr.lower() == label_norm:
-                key_by_col[col_idx] = key
-                break
+        key = PULL_HEADER_ALIASES.get(label_norm)
+        if key:
+            key_by_col[col_idx] = key
 
     gid_col = next((i for i, k in key_by_col.items() if k == "asana_gid"), 0)
-    field_cols = {
-        col: HEADER_KEYS[HEADER_LABELS.index(hdr)]
-        for col, hdr in enumerate(header_row)
-        if hdr in HEADER_LABELS and HEADER_KEYS[HEADER_LABELS.index(hdr)] in PULL_FIELDS
-    }
+    field_cols = {col: key for col, key in key_by_col.items() if key in PULL_FIELDS}
 
     pulled: list[dict[str, Any]] = []
     for row in values[3:]:
@@ -301,6 +335,18 @@ def pull_sheet(spreadsheet_id: str, tab_name: str) -> list[dict[str, Any]]:
 
 def sheet_url(spreadsheet_id: str, tab_name: str | None = None) -> str:
     base = f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/edit"
-    if tab_name:
-        return f"{base}#gid=0"
+    if not tab_name:
+        return base
+    try:
+        service = _service()
+        tab = sanitize_tab_name(tab_name)
+        meta = service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
+        for sheet in meta.get("sheets", []):
+            props = sheet.get("properties") or {}
+            if props.get("title") == tab:
+                gid = props.get("sheetId")
+                if gid is not None:
+                    return f"{base}#gid={gid}"
+    except Exception:
+        logger.exception("Could not resolve sheet gid for %s", tab_name)
     return base

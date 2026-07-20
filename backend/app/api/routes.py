@@ -65,9 +65,16 @@ async def list_projects(db: Session = Depends(get_db)):
 
 
 @router.post("/sync/{project_gid}", response_model=SyncResponse)
-async def sync_project(project_gid: str, db: Session = Depends(get_db)):
+async def sync_project(
+    project_gid: str,
+    incremental: bool = Query(
+        False,
+        description="If true, only pull Asana tasks changed since last sync (faster for Sprint Sheet)",
+    ),
+    db: Session = Depends(get_db),
+):
     async with sync_lock:
-        result = await SyncService(db).sync_all(project_gid)
+        result = await SyncService(db).sync_all(project_gid, incremental=incremental)
         if not result.get("success"):
             raise HTTPException(status_code=400, detail=result.get("error", "Sync failed"))
         sheet_sync = sync_all_sprint_sheets(db, project_gid)
@@ -90,6 +97,12 @@ async def sync_project(project_gid: str, db: Session = Depends(get_db)):
 async def asana_webhook(request: Request):
     from app.services.asana_webhooks import handle_asana_webhook
     return await handle_asana_webhook(request)
+
+
+@router.post("/webhooks/jira")
+async def jira_webhook(request: Request):
+    from app.services.jira_webhooks import handle_jira_webhook
+    return await handle_jira_webhook(request)
 
 
 @router.get("/execution", response_model=ExecutionBoardResponse)
